@@ -9,24 +9,24 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/bills")
+@RequestMapping("/api/bill-payments")
 @RequiredArgsConstructor
 public class BillPaymentController {
 
     private final BillPaymentService service;
 
     @GetMapping
-    public List<BillPayment> getAll(@AuthenticationPrincipal User user) {
-        return service.getAllByUser(user.getId());
+    public List<BillPaymentDTO> getAll(@AuthenticationPrincipal User user) {
+        return service.getAll(user);
     }
 
     @PostMapping
-    public BillPayment create(@AuthenticationPrincipal User user, @RequestBody BillPaymentDTO dto) {
+    public BillPaymentDTO create(@AuthenticationPrincipal User user, @RequestBody BillPaymentDTO dto) {
         return service.create(user, dto);
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        service.delete(id);
+    @PutMapping("/{id}")
+    public BillPaymentDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BillPaymentDTO dto) {
+        return service.update(user, id, dto);
     }
 }

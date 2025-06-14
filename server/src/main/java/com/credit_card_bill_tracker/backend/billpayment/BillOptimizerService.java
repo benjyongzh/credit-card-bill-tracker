@@ -8,7 +8,6 @@ import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -23,6 +22,7 @@ public class BillOptimizerService {
 
         Map<String, Double> billMap = new HashMap<>();
 
+        // Initial calculation
         for (Expense expense : unpaidExpenses) {
             CreditCard card = expense.getCreditCard();
             for (BankAccount account : expense.getBankAccounts()) {
@@ -31,33 +31,26 @@ public class BillOptimizerService {
             }
         }
 
+        // Subtract uncompleted payments
+        List<BillPayment> inProgressPayments = billPaymentRepository.findByUserIdAndCompletedFalse(user.getId());
+        for (BillPayment bp : inProgressPayments) {
+            if (bp.getFromAccount() != null && bp.getToCard() != null) {
+                String key = bp.getFromAccount().getId() + "->" + bp.getToCard().getId();
+                billMap.put(key, billMap.getOrDefault(key, 0.0) - bp.getAmount());
+                if (billMap.get(key) <= 0) {
+                    billMap.remove(key);
+                }
+            }
+        }
+
         return billMap;
     }
 
-    public void markAllBillsComplete(User user, LocalDate date) {
-        List<Expense> unpaidExpenses = expenseRepository.findUnpaidExpenses(user.getId());
-
-        Map<String, Double> billMap = computeBills(user);
-
-        for (Map.Entry<String, Double> entry : billMap.entrySet()) {
-            String[] parts = entry.getKey().split("->");
-            UUID fromAccountId = UUID.fromString(parts[0]);
-            UUID toCardId = UUID.fromString(parts[1]);
-
-            BillPayment payment = new BillPayment();
-            payment.setUser(user);
-            BankAccount from = new BankAccount();
-            from.setId(fromAccountId);
-            payment.setFromAccount(from);
-
-            CreditCard toCard = new CreditCard();
-            toCard.setId(toCardId);
-            payment.setToCard(toCard);
-
-            payment.setAmount(entry.getValue());
-            payment.setDate(date);
-
-            billPaymentRepository.save(payment);
+    public void markAllBillsComplete(User user) {
+        List<BillPayment> inProgress = billPaymentRepository.findByUserIdAndCompletedFalse(user.getId());
+        for (BillPayment bp : inProgress) {
+            bp.setCompleted(true);
         }
+        billPaymentRepository.saveAll(inProgress);
     }
 }

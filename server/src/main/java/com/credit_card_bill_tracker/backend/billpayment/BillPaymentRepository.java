@@ -6,5 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface BillPaymentRepository extends JpaRepository<BillPayment, UUID> {
-    List<BillPayment> findByUserIdAndDeletedFalse(UUID userId);
+
+    List<BillPayment> findByUserIdAndCompletedFalse(UUID userId);
+
+    List<BillPayment> findByUserId(UUID userId);
 }

@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
@@ -21,8 +20,7 @@ public class BillOptimizerController {
     }
 
     @PostMapping("/complete")
-    public void markAllAsComplete(@AuthenticationPrincipal User user, @RequestParam(required = false) String date) {
-        LocalDate billingDate = date != null ? LocalDate.parse(date) : LocalDate.now();
-        service.markAllBillsComplete(user, billingDate);
+    public void markAllAsComplete(@AuthenticationPrincipal User user) {
+        service.markAllBillsComplete(user);
     }
 }

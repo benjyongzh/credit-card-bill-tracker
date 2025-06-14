@@ -12,10 +12,8 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "bill_payments")
 @Getter
 @Setter
-@NoArgsConstructor
 public class BillPayment extends BaseEntity {
 
     @ManyToOne(optional = false)
@@ -33,6 +31,8 @@ public class BillPayment extends BaseEntity {
     @Column(nullable = false)
     private double amount;
 
-    @Column(nullable = false)
     private LocalDate date;
+
+    @Column(nullable = false)
+    private boolean completed = false;
 }
