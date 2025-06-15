@@ -27,4 +27,8 @@ public class BankAccount extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "default_card_id")
     private CreditCard defaultCard;
+
+    public void setIsDefault(boolean bool) {
+        this.isDefault = bool;
+    }
 }
