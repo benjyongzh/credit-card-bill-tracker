@@ -16,13 +16,13 @@ public class CreditCardController {
     private final CreditCardService creditCardService;
 
     @GetMapping
-    public List<CreditCard> getCards(@AuthenticationPrincipal User user) {
-        return creditCardService.getUserCards(user.getId());
+    public List<CreditCardDTO> getAll(@AuthenticationPrincipal User user) {
+        return creditCardService.getAll(user);
     }
 
     @PostMapping
-    public CreditCard createCard(@AuthenticationPrincipal User user, @RequestBody CreditCardDTO dto) {
-        return creditCardService.createCard(user, dto);
+    public CreditCardDTO create(@AuthenticationPrincipal User user, @RequestBody CreditCardDTO dto) {
+        return creditCardService.create(user, dto);
     }
 
     @DeleteMapping("/{id}")

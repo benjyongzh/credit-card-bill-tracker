@@ -1,9 +1,10 @@
 package com.credit_card_bill_tracker.backend.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,5 +33,9 @@ public class UserService {
 
     public UserResponseDTO getProfile(User user) {
         return new UserResponseDTO(user.getUsername(), user.getEmail(), user.getRole());
+    }
+
+    public User getById(UUID id) {
+        return userRepository.findById(id).orElseThrow();
     }
 }

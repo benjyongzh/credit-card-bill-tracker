@@ -11,24 +11,34 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CreditCardService {
 
-    private final CreditCardRepository creditCardRepo;
+    private final CreditCardRepository repository;
+    private final CreditCardMapper mapper;
 
-    public List<CreditCard> getUserCards(UUID userId) {
-        return creditCardRepo.findByUserIdAndDeletedFalse(userId);
+    public List<CreditCardDTO> getAll(User user) {
+        return repository.findByUserIdAndDeletedFalse(user.getId()).stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
-    public CreditCard createCard(User user, CreditCardDTO dto) {
-        CreditCard card = new CreditCard();
+    public CreditCardDTO create(User user, CreditCardDTO dto) {
+        CreditCard card = mapper.fromDto(dto);
         card.setUser(user);
-        card.setCardName(dto.getCardName());
-        card.setLastFourDigits(dto.getLastFourDigits());
-        return creditCardRepo.save(card);
+        return mapper.toDto(repository.save(card));
+    }
+
+    public CreditCardDTO update(User user, UUID id, CreditCardDTO dto) {
+        CreditCard card = repository.findById(id)
+                .filter(c -> c.getUser().getId().equals(user.getId()))
+                .orElseThrow();
+
+        mapper.updateEntityFromDto(card, dto);
+        return mapper.toDto(repository.save(card));
     }
 
     public void deleteCard(UUID id) {
-        CreditCard card = creditCardRepo.findById(id)
+        CreditCard card = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Card not found"));
         card.setDeleted(true);
-        creditCardRepo.save(card);
+        repository.save(card);
     }
 }

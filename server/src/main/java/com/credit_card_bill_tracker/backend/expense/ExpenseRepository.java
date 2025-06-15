@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
+    List<Expense> findByUserIdAndDeletedFalse(UUID userId);
     List<Expense> findByUserIdAndCreditCardIdAndDeletedFalse(UUID userId, UUID cardId);
 
     @Query("SELECT e FROM Expense e WHERE e.deleted = false " +

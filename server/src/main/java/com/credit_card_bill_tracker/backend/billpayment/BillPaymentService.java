@@ -39,5 +39,17 @@ public class BillPaymentService {
         billPaymentMapper.updateEntityFromDto(entity, dto);
         return billPaymentMapper.toDto(billPaymentRepository.save(entity));
     }
+
+    public void delete(User user, UUID id) {
+        BillPayment entity = billPaymentRepository.findById(id)
+                .filter(bp -> bp.getUser().getId().equals(user.getId()))
+                .orElseThrow();
+
+        if (entity.isCompleted()) {
+            throw new IllegalStateException("Cannot delete a completed bill payment.");
+        }
+
+        billPaymentRepository.delete(entity);
+    }
 }
 

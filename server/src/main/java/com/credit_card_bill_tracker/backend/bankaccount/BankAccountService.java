@@ -16,17 +16,18 @@ public class BankAccountService {
 
     private final BankAccountRepository bankAccountRepo;
     private final CreditCardRepository creditCardRepo;
+    private final BankAccountMapper mapper;
 
-    public List<BankAccount> getUserAccounts(UUID userId) {
-        return bankAccountRepo.findByUserIdAndDeletedFalse(userId);
+    public List<BankAccountDTO> getAll(User user) {
+        return bankAccountRepo.findByUserIdAndDeletedFalse(user.getId()).stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
     @Transactional
-    public BankAccount createAccount(User user, BankAccountDTO dto) {
-        BankAccount account = new BankAccount();
+    public BankAccountDTO create(User user, BankAccountDTO dto) {
+        BankAccount account = mapper.fromDto(dto);
         account.setUser(user);
-        account.setName(dto.getName());
-        account.setIsDefault(dto.isDefault());
 
         if (dto.getDefaultCardId() != null) {
             CreditCard card = creditCardRepo.findById(dto.getDefaultCardId())
@@ -38,12 +39,31 @@ public class BankAccountService {
             throw new RuntimeException("User already has a default account");
         }
 
-        return bankAccountRepo.save(account);
+        return mapper.toDto(bankAccountRepo.save(account));
     }
 
-    public void deleteAccount(UUID id) {
+    public BankAccountDTO update(User user, UUID id, BankAccountDTO dto) {
         BankAccount account = bankAccountRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Bank account not found"));
+                .filter(a -> a.getUser().getId().equals(user.getId()))
+                .orElseThrow();
+
+        mapper.updateEntityFromDto(account, dto);
+
+        if (dto.getDefaultCardId() != null) {
+            CreditCard card = creditCardRepo.findById(dto.getDefaultCardId())
+                    .orElseThrow(() -> new RuntimeException("Card not found"));
+            account.setDefaultCard(card);
+        } else {
+            account.setDefaultCard(null);
+        }
+
+        return mapper.toDto(bankAccountRepo.save(account));
+    }
+
+    public void delete(User user, UUID id) {
+        BankAccount account = bankAccountRepo.findById(id)
+                .filter(a -> a.getUser().getId().equals(user.getId()))
+                .orElseThrow();
         account.setDeleted(true);
         bankAccountRepo.save(account);
     }

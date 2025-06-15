@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/bill-payments")
+@RequestMapping("/api/bills")
 @RequiredArgsConstructor
 public class BillPaymentController {
 
@@ -28,5 +28,10 @@ public class BillPaymentController {
     @PutMapping("/{id}")
     public BillPaymentDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BillPaymentDTO dto) {
         return service.update(user, id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+        service.delete(user, id);
     }
 }

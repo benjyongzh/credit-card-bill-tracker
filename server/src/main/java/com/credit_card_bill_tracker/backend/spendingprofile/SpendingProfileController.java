@@ -9,24 +9,29 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/profiles")
+@RequestMapping("/api/spending-profiles")
 @RequiredArgsConstructor
 public class SpendingProfileController {
 
     private final SpendingProfileService service;
 
     @GetMapping
-    public List<SpendingProfile> getAll(@AuthenticationPrincipal User user) {
-        return service.getUserProfiles(user.getId());
+    public List<SpendingProfileDTO> getAll(@AuthenticationPrincipal User user) {
+        return service.getAll(user);
     }
 
     @PostMapping
-    public SpendingProfile create(@AuthenticationPrincipal User user, @RequestBody SpendingProfileDTO dto) {
+    public SpendingProfileDTO create(@AuthenticationPrincipal User user, @RequestBody SpendingProfileDTO dto) {
         return service.create(user, dto);
     }
 
+    @PutMapping("/{id}")
+    public SpendingProfileDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody SpendingProfileDTO dto) {
+        return service.update(user, id, dto);
+    }
+
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        service.delete(id);
+    public void delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+        service.delete(user, id);
     }
 }

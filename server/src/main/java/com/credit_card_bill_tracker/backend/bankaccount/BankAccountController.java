@@ -13,20 +13,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BankAccountController {
 
-    private final BankAccountService bankAccountService;
+    private final BankAccountService service;
 
     @GetMapping
-    public List<BankAccount> getAccounts(@AuthenticationPrincipal User user) {
-        return bankAccountService.getUserAccounts(user.getId());
+    public List<BankAccountDTO> getAll(@AuthenticationPrincipal User user) {
+        return service.getAll(user);
     }
 
     @PostMapping
-    public BankAccount createAccount(@AuthenticationPrincipal User user, @RequestBody BankAccountDTO dto) {
-        return bankAccountService.createAccount(user, dto);
+    public BankAccountDTO create(@AuthenticationPrincipal User user, @RequestBody BankAccountDTO dto) {
+        return service.create(user, dto);
+    }
+
+    @PutMapping("/{id}")
+    public BankAccountDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BankAccountDTO dto) {
+        return service.update(user, id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAccount(@PathVariable UUID id) {
-        bankAccountService.deleteAccount(id);
+    public void delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+        service.delete(user, id);
     }
 }

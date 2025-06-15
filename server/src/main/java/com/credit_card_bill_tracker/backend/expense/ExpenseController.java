@@ -13,20 +13,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ExpenseController {
 
-    private final ExpenseService expenseService;
+    private final ExpenseService service;
 
-    @GetMapping("/{cardId}")
-    public List<Expense> getExpenses(@AuthenticationPrincipal User user, @PathVariable UUID cardId) {
-        return expenseService.getExpenses(user.getId(), cardId);
+    @GetMapping
+    public List<ExpenseDTO> get(@AuthenticationPrincipal User user, @RequestParam(required = false) UUID cardId) {
+        return service.getAll(user, cardId);
     }
 
     @PostMapping
-    public Expense create(@AuthenticationPrincipal User user, @RequestBody ExpenseDTO dto) {
-        return expenseService.createExpense(user, dto);
+    public ExpenseDTO create(@AuthenticationPrincipal User user, @RequestBody ExpenseDTO dto) {
+        return service.create(user, dto);
+    }
+
+    @PutMapping("/{id}")
+    public ExpenseDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody ExpenseDTO dto) {
+        return service.update(user, id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        expenseService.deleteExpense(id);
+    public void delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+        service.delete(user, id);
     }
 }

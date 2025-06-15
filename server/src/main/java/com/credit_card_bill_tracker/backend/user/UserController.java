@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -17,8 +19,12 @@ public class UserController {
         return userService.getProfile(userService.register(dto));
     }
 
-    @GetMapping("/testget")
-    public UserResponseDTO getTestUser(@AuthenticationPrincipal User user) {
-        return userService.getProfile(user);
+    @GetMapping({"", "/{id}"})
+    public UserResponseDTO getUserById(@AuthenticationPrincipal User currentUser, @PathVariable(required = false) UUID id) {
+        if (id != null) {
+            return userService.getProfile(userService.getById(id));
+        } else {
+            return userService.getProfile(currentUser);
+        }
     }
 }
