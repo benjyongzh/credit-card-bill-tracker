@@ -25,6 +25,15 @@ public class ExpenseController {
         return service.create(user, dto);
     }
 
+    @PostMapping("/with-profile")
+    public ExpenseDTO createExpenseWithProfile(
+            @AuthenticationPrincipal User user,
+            @RequestParam UUID spendingProfileId,
+            @RequestBody ExpenseCreateDTO dto
+    ) {
+        return service.createWithSpendingProfile(user, dto, spendingProfileId);
+    }
+
     @PutMapping("/{id}")
     public ExpenseDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody ExpenseDTO dto) {
         return service.update(user, id, dto);

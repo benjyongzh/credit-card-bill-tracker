@@ -34,9 +34,6 @@ public class Expense extends BaseEntity {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private int sharedBetween;
-
     @ManyToMany
     @JoinTable(
             name = "expense_bank_accounts",

@@ -10,11 +10,9 @@ public class ExpenseMapper {
 
     public ExpenseDTO toDto(Expense entity) {
         ExpenseDTO dto = new ExpenseDTO();
-//        dto.setId(entity.getId());
         dto.setDate(entity.getDate());
         dto.setAmount(entity.getAmount());
         dto.setDescription(entity.getDescription());
-        dto.setSharedBetween(entity.getSharedBetween());
         dto.setCreditCardId(entity.getCreditCard().getId());
         dto.setBankAccountIds(entity.getBankAccounts().stream()
                 .map(BankAccount::getId)
@@ -27,7 +25,6 @@ public class ExpenseMapper {
         entity.setDate(dto.getDate());
         entity.setAmount(dto.getAmount());
         entity.setDescription(dto.getDescription());
-        entity.setSharedBetween(dto.getSharedBetween());
         return entity;
     }
 
@@ -35,6 +32,5 @@ public class ExpenseMapper {
         entity.setDate(dto.getDate());
         entity.setAmount(dto.getAmount());
         entity.setDescription(dto.getDescription());
-        entity.setSharedBetween(dto.getSharedBetween());
     }
 }

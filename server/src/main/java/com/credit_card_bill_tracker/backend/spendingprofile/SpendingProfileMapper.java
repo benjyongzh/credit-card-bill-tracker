@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 public class SpendingProfileMapper {
 
     public SpendingProfileDTO toDto(SpendingProfile entity) {
+        //TODO include id of spending profile
         SpendingProfileDTO dto = new SpendingProfileDTO();
         dto.setName(entity.getName());
         dto.setBankAccountIds(entity.getBankAccounts().stream()

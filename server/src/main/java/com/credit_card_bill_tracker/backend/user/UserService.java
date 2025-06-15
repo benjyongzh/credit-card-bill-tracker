@@ -1,5 +1,9 @@
 package com.credit_card_bill_tracker.backend.user;
 
+import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
+import com.credit_card_bill_tracker.backend.bankaccount.BankAccountRepository;
+import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
+import com.credit_card_bill_tracker.backend.creditcard.CreditCardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,6 +15,8 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final CreditCardRepository creditCardRepository;
+    private final BankAccountRepository bankAccountRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -28,7 +34,23 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
         user.setRole("user");
 
-        return userRepository.save(user);
+        user = userRepository.save(user);
+
+        // Create default credit card
+        CreditCard card = new CreditCard();
+        card.setUser(user);
+        card.setCardName("Default Card");
+        creditCardRepository.save(card);
+
+        // Create default bank account
+        BankAccount account = new BankAccount();
+        account.setUser(user);
+        account.setName("Default Bank Account");
+        account.setIsDefault(true);
+        account.setDefaultCard(card);
+        bankAccountRepository.save(account);
+
+        return user;
     }
 
     public UserResponseDTO getProfile(User user) {
