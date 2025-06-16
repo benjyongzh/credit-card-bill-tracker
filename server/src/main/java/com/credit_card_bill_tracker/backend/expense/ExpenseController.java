@@ -16,7 +16,7 @@ public class ExpenseController {
     private final ExpenseService service;
 
     @GetMapping
-    public List<ExpenseDTO> get(@AuthenticationPrincipal User user, @RequestParam(required = false) UUID cardId) {
+    public List<ExpenseResponseDTO> get(@AuthenticationPrincipal User user, @RequestParam(required = false) UUID cardId) {
         return service.getAll(user, cardId);
     }
 

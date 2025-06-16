@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
-public class SpendingProfileDTO {
+public class SpendingProfileResponseDTO {
+    private UUID id;
+    private UUID userId;
     private String name;
     private List<UUID> bankAccountIds;
 }

@@ -16,17 +16,17 @@ public class BankAccountController {
     private final BankAccountService service;
 
     @GetMapping
-    public List<BankAccountDTO> getAll(@AuthenticationPrincipal User user) {
+    public List<BankAccountResponseDTO> getAll(@AuthenticationPrincipal User user) {
         return service.getAll(user);
     }
 
     @PostMapping
-    public BankAccountDTO create(@AuthenticationPrincipal User user, @RequestBody BankAccountDTO dto) {
+    public BankAccountResponseDTO create(@AuthenticationPrincipal User user, @RequestBody BankAccountDTO dto) {
         return service.create(user, dto);
     }
 
     @PutMapping("/{id}")
-    public BankAccountDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BankAccountDTO dto) {
+    public BankAccountResponseDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BankAccountDTO dto) {
         return service.update(user, id, dto);
     }
 

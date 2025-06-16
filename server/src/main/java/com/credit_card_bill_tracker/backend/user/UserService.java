@@ -54,7 +54,7 @@ public class UserService {
     }
 
     public UserResponseDTO getProfile(User user) {
-        return new UserResponseDTO(user.getUsername(), user.getEmail(), user.getRole());
+        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
     }
 
     public User getById(UUID id) {

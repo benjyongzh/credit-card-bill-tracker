@@ -20,6 +20,20 @@ public class ExpenseMapper {
         return dto;
     }
 
+    public ExpenseResponseDTO toResponseDto(Expense entity) {
+        ExpenseResponseDTO dto = new ExpenseResponseDTO();
+        dto.setId(entity.getId());
+        dto.setUserId(entity.getUser().getId());
+        dto.setDate(entity.getDate());
+        dto.setAmount(entity.getAmount());
+        dto.setDescription(entity.getDescription());
+        dto.setCreditCardId(entity.getCreditCard().getId());
+        dto.setBankAccountIds(entity.getBankAccounts().stream()
+                .map(BankAccount::getId)
+                .collect(Collectors.toList()));
+        return dto;
+    }
+
     public Expense fromDto(ExpenseDTO dto) {
         Expense entity = new Expense();
         entity.setDate(dto.getDate());

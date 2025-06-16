@@ -5,7 +5,9 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class CreditCardDTO {
+public class CreditCardResponseDTO {
+    private UUID id;
+    private UUID userId;
     private String cardName;
     private String lastFourDigits;
 }

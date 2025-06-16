@@ -6,7 +6,8 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
-public class BillPaymentDTO {
+public class BillPaymentResponseDTO {
+    private UUID id;
     private UUID fromAccountId;
     private UUID toCardId;
     private UUID toAccountId;

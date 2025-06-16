@@ -14,25 +14,25 @@ public class CreditCardService {
     private final CreditCardRepository repository;
     private final CreditCardMapper mapper;
 
-    public List<CreditCardDTO> getAll(User user) {
+    public List<CreditCardResponseDTO> getAll(User user) {
         return repository.findByUserIdAndDeletedFalse(user.getId()).stream()
-                .map(mapper::toDto)
+                .map(mapper::toResponseDto)
                 .toList();
     }
 
-    public CreditCardDTO create(User user, CreditCardDTO dto) {
+    public CreditCardResponseDTO create(User user, CreditCardDTO dto) {
         CreditCard card = mapper.fromDto(dto);
         card.setUser(user);
-        return mapper.toDto(repository.save(card));
+        return mapper.toResponseDto(repository.save(card));
     }
 
-    public CreditCardDTO update(User user, UUID id, CreditCardDTO dto) {
+    public CreditCardResponseDTO update(User user, UUID id, CreditCardDTO dto) {
         CreditCard card = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
                 .orElseThrow();
 
         mapper.updateEntityFromDto(card, dto);
-        return mapper.toDto(repository.save(card));
+        return mapper.toResponseDto(repository.save(card));
     }
 
     public void deleteCard(UUID id) {

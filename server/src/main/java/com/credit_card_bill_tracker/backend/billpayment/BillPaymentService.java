@@ -14,20 +14,20 @@ public class BillPaymentService {
     private final BillPaymentRepository billPaymentRepository;
     private final BillPaymentMapper billPaymentMapper;
 
-    public List<BillPaymentDTO> getAll(User user) {
+    public List<BillPaymentResponseDTO> getAll(User user) {
         return billPaymentRepository.findByUserId(user.getId()).stream()
-                .map(billPaymentMapper::toDto)
+                .map(billPaymentMapper::toResponseDto)
                 .toList();
     }
 
-    public BillPaymentDTO create(User user, BillPaymentDTO dto) {
+    public BillPaymentResponseDTO create(User user, BillPaymentDTO dto) {
         BillPayment entity = billPaymentMapper.fromDto(dto);
         entity.setUser(user);
         entity.setCompleted(false);
-        return billPaymentMapper.toDto(billPaymentRepository.save(entity));
+        return billPaymentMapper.toResponseDto(billPaymentRepository.save(entity));
     }
 
-    public BillPaymentDTO update(User user, UUID id, BillPaymentDTO dto) {
+    public BillPaymentResponseDTO update(User user, UUID id, BillPaymentDTO dto) {
         BillPayment entity = billPaymentRepository.findById(id)
                 .filter(bp -> bp.getUser().getId().equals(user.getId()))
                 .orElseThrow();
@@ -37,7 +37,7 @@ public class BillPaymentService {
         }
 
         billPaymentMapper.updateEntityFromDto(entity, dto);
-        return billPaymentMapper.toDto(billPaymentRepository.save(entity));
+        return billPaymentMapper.toResponseDto(billPaymentRepository.save(entity));
     }
 
     public void delete(User user, UUID id) {

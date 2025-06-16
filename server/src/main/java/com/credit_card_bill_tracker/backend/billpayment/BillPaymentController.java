@@ -16,17 +16,17 @@ public class BillPaymentController {
     private final BillPaymentService service;
 
     @GetMapping
-    public List<BillPaymentDTO> getAll(@AuthenticationPrincipal User user) {
+    public List<BillPaymentResponseDTO> getAll(@AuthenticationPrincipal User user) {
         return service.getAll(user);
     }
 
     @PostMapping
-    public BillPaymentDTO create(@AuthenticationPrincipal User user, @RequestBody BillPaymentDTO dto) {
+    public BillPaymentResponseDTO create(@AuthenticationPrincipal User user, @RequestBody BillPaymentDTO dto) {
         return service.create(user, dto);
     }
 
     @PutMapping("/{id}")
-    public BillPaymentDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BillPaymentDTO dto) {
+    public BillPaymentResponseDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BillPaymentDTO dto) {
         return service.update(user, id, dto);
     }
 

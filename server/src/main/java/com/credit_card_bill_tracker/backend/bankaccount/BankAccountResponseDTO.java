@@ -5,7 +5,9 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class BankAccountDTO {
+public class BankAccountResponseDTO {
+    private UUID id;
+    private UUID userId;
     private String name;
     private boolean isDefault;
     private UUID defaultCardId;

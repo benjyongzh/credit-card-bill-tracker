@@ -27,14 +27,14 @@ public class ExpenseService {
     private final BankAccountRepository bankAccountRepo;
     private final SpendingProfileRepository spendingProfileRepo;
 
-    public List<ExpenseDTO> getAll(User user, UUID cardId) {
+    public List<ExpenseResponseDTO> getAll(User user, UUID cardId) {
         if (cardId != null) {
             return repository.findByUserIdAndCreditCardIdAndDeletedFalse(user.getId(), cardId).stream()
-                    .map(mapper::toDto)
+                    .map(mapper::toResponseDto)
                     .toList();
         } else {
             return repository.findByUserIdAndDeletedFalse(user.getId()).stream()
-                    .map(mapper::toDto)
+                    .map(mapper::toResponseDto)
                     .toList();
         }
     }

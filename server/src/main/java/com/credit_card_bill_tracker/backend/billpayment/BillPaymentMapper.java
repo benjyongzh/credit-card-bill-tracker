@@ -14,6 +14,17 @@ public class BillPaymentMapper {
 
     public BillPaymentDTO toDto(BillPayment entity) {
         BillPaymentDTO dto = new BillPaymentDTO();
+        dto.setAmount(entity.getAmount());
+        dto.setDate(entity.getDate());
+        dto.setCompleted(entity.isCompleted());
+        dto.setFromAccountId(entity.getFromAccount().getId());
+        if (entity.getToCard() != null) dto.setToCardId(entity.getToCard().getId());
+        if (entity.getToAccount() != null) dto.setToAccountId(entity.getToAccount().getId());
+        return dto;
+    }
+
+    public BillPaymentResponseDTO toResponseDto(BillPayment entity) {
+        BillPaymentResponseDTO dto = new BillPaymentResponseDTO();
         dto.setId(entity.getId());
         dto.setAmount(entity.getAmount());
         dto.setDate(entity.getDate());

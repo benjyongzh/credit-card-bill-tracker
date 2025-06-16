@@ -18,14 +18,14 @@ public class BankAccountService {
     private final CreditCardRepository creditCardRepo;
     private final BankAccountMapper mapper;
 
-    public List<BankAccountDTO> getAll(User user) {
+    public List<BankAccountResponseDTO> getAll(User user) {
         return bankAccountRepo.findByUserIdAndDeletedFalse(user.getId()).stream()
-                .map(mapper::toDto)
+                .map(mapper::toResponseDto)
                 .toList();
     }
 
     @Transactional
-    public BankAccountDTO create(User user, BankAccountDTO dto) {
+    public BankAccountResponseDTO create(User user, BankAccountDTO dto) {
         BankAccount account = mapper.fromDto(dto);
         account.setUser(user);
 
@@ -39,10 +39,10 @@ public class BankAccountService {
             throw new RuntimeException("User already has a default account");
         }
 
-        return mapper.toDto(bankAccountRepo.save(account));
+        return mapper.toResponseDto(bankAccountRepo.save(account));
     }
 
-    public BankAccountDTO update(User user, UUID id, BankAccountDTO dto) {
+    public BankAccountResponseDTO update(User user, UUID id, BankAccountDTO dto) {
         BankAccount account = bankAccountRepo.findById(id)
                 .filter(a -> a.getUser().getId().equals(user.getId()))
                 .orElseThrow();
@@ -57,7 +57,7 @@ public class BankAccountService {
             account.setDefaultCard(null);
         }
 
-        return mapper.toDto(bankAccountRepo.save(account));
+        return mapper.toResponseDto(bankAccountRepo.save(account));
     }
 
     public void delete(User user, UUID id) {

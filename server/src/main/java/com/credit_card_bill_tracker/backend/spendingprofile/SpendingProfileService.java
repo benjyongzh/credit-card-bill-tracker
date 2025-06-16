@@ -18,22 +18,22 @@ public class SpendingProfileService {
     private final SpendingProfileMapper mapper;
     private final BankAccountRepository bankAccountRepo;
 
-    public List<SpendingProfileDTO> getAll(User user) {
+    public List<SpendingProfileResponseDTO> getAll(User user) {
         return repository.findByUserIdAndDeletedFalse(user.getId()).stream()
-                .map(mapper::toDto)
+                .map(mapper::toResponseDto)
                 .toList();
     }
 
-    public SpendingProfileDTO create(User user, SpendingProfileDTO dto) {
+    public SpendingProfileResponseDTO create(User user, SpendingProfileDTO dto) {
         SpendingProfile profile = mapper.fromDto(dto);
         profile.setUser(user);
         profile.setBankAccounts(dto.getBankAccountIds().stream()
                 .map(id -> bankAccountRepo.findById(id).orElseThrow())
                 .collect(Collectors.toList()));
-        return mapper.toDto(repository.save(profile));
+        return mapper.toResponseDto(repository.save(profile));
     }
 
-    public SpendingProfileDTO update(User user, UUID id, SpendingProfileDTO dto) {
+    public SpendingProfileResponseDTO update(User user, UUID id, SpendingProfileDTO dto) {
         SpendingProfile entity = repository.findById(id)
                 .filter(p -> p.getUser().getId().equals(user.getId()))
                 .orElseThrow();
@@ -42,7 +42,7 @@ public class SpendingProfileService {
                 .map(bankAccountRepo::findById)
                 .map(Optional::orElseThrow)
                 .collect(Collectors.toList()));
-        return mapper.toDto(repository.save(entity));
+        return mapper.toResponseDto(repository.save(entity));
     }
 
     public void delete(User user, UUID id) {

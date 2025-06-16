@@ -7,7 +7,15 @@ public class CreditCardMapper {
 
     public CreditCardDTO toDto(CreditCard entity) {
         CreditCardDTO dto = new CreditCardDTO();
+        dto.setCardName(entity.getCardName());
+        dto.setLastFourDigits(entity.getLastFourDigits());
+        return dto;
+    }
+
+    public CreditCardResponseDTO toResponseDto(CreditCard entity) {
+        CreditCardResponseDTO dto = new CreditCardResponseDTO();
         dto.setId(entity.getId());
+        dto.setUserId(entity.getUser().getId());
         dto.setCardName(entity.getCardName());
         dto.setLastFourDigits(entity.getLastFourDigits());
         return dto;

@@ -7,7 +7,16 @@ public class BankAccountMapper {
 
     public BankAccountDTO toDto(BankAccount entity) {
         BankAccountDTO dto = new BankAccountDTO();
+        dto.setName(entity.getName());
+        dto.setDefault(entity.isDefault());
+        dto.setDefaultCardId(entity.getDefaultCard() != null ? entity.getDefaultCard().getId() : null);
+        return dto;
+    }
+
+    public BankAccountResponseDTO toResponseDto(BankAccount entity) {
+        BankAccountResponseDTO dto = new BankAccountResponseDTO();
         dto.setId(entity.getId());
+        dto.setUserId(entity.getUser().getId());
         dto.setName(entity.getName());
         dto.setDefault(entity.isDefault());
         dto.setDefaultCardId(entity.getDefaultCard() != null ? entity.getDefaultCard().getId() : null);

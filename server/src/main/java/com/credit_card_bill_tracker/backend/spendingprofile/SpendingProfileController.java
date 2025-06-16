@@ -16,17 +16,17 @@ public class SpendingProfileController {
     private final SpendingProfileService service;
 
     @GetMapping
-    public List<SpendingProfileDTO> getAll(@AuthenticationPrincipal User user) {
+    public List<SpendingProfileResponseDTO> getAll(@AuthenticationPrincipal User user) {
         return service.getAll(user);
     }
 
     @PostMapping
-    public SpendingProfileDTO create(@AuthenticationPrincipal User user, @RequestBody SpendingProfileDTO dto) {
+    public SpendingProfileResponseDTO create(@AuthenticationPrincipal User user, @RequestBody SpendingProfileDTO dto) {
         return service.create(user, dto);
     }
 
     @PutMapping("/{id}")
-    public SpendingProfileDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody SpendingProfileDTO dto) {
+    public SpendingProfileResponseDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody SpendingProfileDTO dto) {
         return service.update(user, id, dto);
     }
 
