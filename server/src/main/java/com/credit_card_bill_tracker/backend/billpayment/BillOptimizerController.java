@@ -18,9 +18,4 @@ public class BillOptimizerController {
     public Map<String, Double> getOptimized(@AuthenticationPrincipal User user) {
         return service.computeBills(user);
     }
-
-    @PostMapping("/complete")
-    public void markAllAsComplete(@AuthenticationPrincipal User user) {
-        service.markAllBillsComplete(user);
-    }
 }

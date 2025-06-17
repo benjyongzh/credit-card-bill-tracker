@@ -51,5 +51,13 @@ public class BillPaymentService {
 
         billPaymentRepository.delete(entity);
     }
+
+    public void markBillsComplete(User user) {
+        List<BillPayment> inProgress = billPaymentRepository.findByUserIdAndCompletedFalse(user.getId());
+        for (BillPayment bp : inProgress) {
+            bp.setCompleted(true);
+        }
+        billPaymentRepository.saveAll(inProgress);
+    }
 }
 

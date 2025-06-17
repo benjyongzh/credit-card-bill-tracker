@@ -45,12 +45,4 @@ public class BillOptimizerService {
 
         return billMap;
     }
-
-    public void markAllBillsComplete(User user) {
-        List<BillPayment> inProgress = billPaymentRepository.findByUserIdAndCompletedFalse(user.getId());
-        for (BillPayment bp : inProgress) {
-            bp.setCompleted(true);
-        }
-        billPaymentRepository.saveAll(inProgress);
-    }
 }

@@ -34,4 +34,9 @@ public class BillPaymentController {
     public void delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
         service.delete(user, id);
     }
+
+    @PostMapping("/complete")
+    public void markAsComplete(@AuthenticationPrincipal User user) {
+        service.markBillsComplete(user);
+    }
 }
