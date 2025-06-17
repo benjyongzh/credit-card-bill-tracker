@@ -21,7 +21,7 @@ public class BillingCycleService {
 
     public List<BillingCycleResponseDTO> getAll(User user) {
         return repository.findByUserIdAndDeletedFalse(user.getId()).stream()
-                .map(mapper::toResponseDto)
+                .map(mapper::toResponseDTO)
                 .toList();
     }
 
@@ -29,7 +29,7 @@ public class BillingCycleService {
         BillingCycle cycle = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
                 .orElseThrow();
-        return mapper.toResponseDto(cycle);
+        return mapper.toResponseDTO(cycle);
     }
 
     @Transactional
@@ -42,7 +42,7 @@ public class BillingCycleService {
                 .map(id -> billPaymentRepo.findById(id).orElseThrow())
                 .toList();
         cycle.setBillPayments(payments);
-        return mapper.toResponseDto(repository.save(cycle));
+        return mapper.toResponseDTO(repository.save(cycle));
     }
 
     @Transactional
@@ -50,13 +50,13 @@ public class BillingCycleService {
         BillingCycle cycle = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
                 .orElseThrow();
-        mapper.updateEntityFromDto(dto, cycle);
+        mapper.updateEntity(cycle, dto);
         List<BillPayment> payments = dto.getBillPaymentIds().stream()
                 .map(billPaymentRepo::findById)
                 .map(Optional::orElseThrow)
                 .toList();
         cycle.setBillPayments(payments);
-        return mapper.toResponseDto(repository.save(cycle));
+        return mapper.toResponseDTO(repository.save(cycle));
     }
 
     @Transactional

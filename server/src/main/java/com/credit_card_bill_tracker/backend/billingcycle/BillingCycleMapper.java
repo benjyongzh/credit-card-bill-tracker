@@ -1,9 +1,8 @@
 package com.credit_card_bill_tracker.backend.billingcycle;
 
 import com.credit_card_bill_tracker.backend.billpayment.BillPayment;
-import com.credit_card_bill_tracker.backend.billpayment.BillPaymentDTO;
+import com.credit_card_bill_tracker.backend.billpayment.BillPaymentMapper;
 import com.credit_card_bill_tracker.backend.billpayment.BillPaymentRepository;
-import com.credit_card_bill_tracker.backend.billpayment.BillPaymentResponseDTO;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,8 +11,9 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class BillingCycleMapper {
+class BillingCycleMapper {
     private final BillPaymentRepository billPaymentRepo;
+    private final BillPaymentMapper billPaymentMapper;
 
     public BillingCycle toEntity(BillingCycleDTO dto, User user) {
         BillingCycle entity = new BillingCycle();
@@ -42,10 +42,7 @@ public class BillingCycleMapper {
         dto.setLabel(entity.getLabel());
         dto.setCompletedDate(entity.getCompletedDate());
         dto.setBillPayments(entity.getBillPayments().stream()
-                .map(bp -> new BillPaymentResponseDTO(bp.getId(), bp.getFromAccount().getId(),
-                        bp.getToCard() != null ? bp.getToCard().getId() : null,
-                        bp.getToAccount() != null ? bp.getToAccount().getId() : null,
-                        bp.getAmount(), bp.isCompleted()))
+                .map(billPaymentMapper::toResponseDto)
                 .toList());
         return dto;
     }
