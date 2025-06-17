@@ -34,12 +34,19 @@ public class BankAccountService {
                     .orElseThrow(() -> new RuntimeException("Card not found"));
             account.setDefaultCard(card);
         }
-
-        if (dto.isDefault() && bankAccountRepo.existsByUserIdAndIsDefaultTrue(user.getId())) {
-            throw new RuntimeException("User already has a default account");
+        if (dto.isDefault() && bankAccountRepo.existsByUserIdAndIsDefaultTrueAndDeletedFalse(user.getId())) {
+            List<BankAccount> existingAccounts = bankAccountRepo.findByUserIdAndDeletedFalse(user.getId());
+            for (BankAccount acc : existingAccounts) {
+                acc.setIsDefault(false);
+            }
+            bankAccountRepo.saveAll(existingAccounts);
+            bankAccountRepo.save(account);
+            BankAccountResponseDTO response = mapper.toResponseDto(account);
+            response.setChangedOtherAccountsToNotDefault(true);
+            return response;
+        } else {
+            return mapper.toResponseDto(bankAccountRepo.save(account));
         }
-
-        return mapper.toResponseDto(bankAccountRepo.save(account));
     }
 
     public BankAccountResponseDTO update(User user, UUID id, BankAccountDTO dto) {

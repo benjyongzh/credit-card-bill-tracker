@@ -7,5 +7,5 @@ import java.util.UUID;
 
 public interface BankAccountRepository extends JpaRepository<BankAccount, UUID> {
     List<BankAccount> findByUserIdAndDeletedFalse(UUID userId);
-    boolean existsByUserIdAndIsDefaultTrue(UUID userId);
+    boolean existsByUserIdAndIsDefaultTrueAndDeletedFalse(UUID userId);
 }
