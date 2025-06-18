@@ -7,7 +7,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -66,5 +69,9 @@ public class BillingCycleService {
                 .orElseThrow();
         cycle.setDeleted(true);
         repository.save(cycle);
+    }
+
+    public String setNewBillingCycleDefaultLabel(LocalDate date) {
+        return date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH) + " " + date.getYear();
     }
 }

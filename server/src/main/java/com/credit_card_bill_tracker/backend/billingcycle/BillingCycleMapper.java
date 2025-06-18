@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-class BillingCycleMapper {
+public class BillingCycleMapper {
     private final BillPaymentRepository billPaymentRepo;
     private final BillPaymentMapper billPaymentMapper;
 

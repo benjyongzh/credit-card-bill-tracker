@@ -1,9 +1,12 @@
 package com.credit_card_bill_tracker.backend.billpayment;
 
+import com.credit_card_bill_tracker.backend.billingcycle.*;
+import com.credit_card_bill_tracker.backend.common.BaseEntity;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,6 +16,7 @@ public class BillPaymentService {
 
     private final BillPaymentRepository billPaymentRepository;
     private final BillPaymentMapper billPaymentMapper;
+    private final BillingCycleService cycleService;
 
     public List<BillPaymentResponseDTO> getAll(User user) {
         return billPaymentRepository.findByUserId(user.getId()).stream()
@@ -58,6 +62,12 @@ public class BillPaymentService {
             bp.setCompleted(true);
         }
         billPaymentRepository.saveAll(inProgress);
+        BillingCycleDTO cycle = new BillingCycleDTO();
+        cycle.setBillPaymentIds(inProgress.stream().map(BaseEntity::getId).toList());
+        LocalDate now = LocalDate.now();
+        cycle.setCompletedDate(now);
+        cycle.setLabel(cycleService.setNewBillingCycleDefaultLabel(now));
+        cycleService.create(user, cycle);
     }
 }
 
