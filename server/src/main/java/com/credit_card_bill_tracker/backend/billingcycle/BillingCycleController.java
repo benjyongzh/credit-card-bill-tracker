@@ -1,5 +1,7 @@
 package com.credit_card_bill_tracker.backend.billingcycle;
 
+import com.credit_card_bill_tracker.backend.billpayment.DeferredBill;
+import com.credit_card_bill_tracker.backend.billpayment.DeferredBillResponseDTO;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,5 +44,10 @@ public class BillingCycleController {
     @DeleteMapping("/{id}")
     public void delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
         service.delete(user, id);
+    }
+
+    @GetMapping("/{id}/deferred-bills")
+    public List<DeferredBillResponseDTO> getDeferredBills(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+        return service.getDeferredBills(user, id);
     }
 }

@@ -1,7 +1,8 @@
 package com.credit_card_bill_tracker.backend.billingcycle;
 
-import com.credit_card_bill_tracker.backend.billpayment.BillPayment;
-import com.credit_card_bill_tracker.backend.billpayment.BillPaymentRepository;
+import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
+import com.credit_card_bill_tracker.backend.billpayment.*;
+import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.user.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -9,22 +10,22 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.TextStyle;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class BillingCycleService {
 
     private final BillingCycleRepository repository;
-    private final BillingCycleMapper mapper;
+    private final BillingCycleMapper billingCycleMapper;
     private final BillPaymentRepository billPaymentRepo;
+    private final DeferredBillRepository deferredBillRepo;
+    private final DeferredBillMapper deferredBillMapper;
+    private final BillOptimizerService billOptimizerService;
 
     public List<BillingCycleResponseDTO> getAll(User user) {
         return repository.findByUserIdAndDeletedFalse(user.getId()).stream()
-                .map(mapper::toResponseDTO)
+                .map(billingCycleMapper::toResponseDTO)
                 .toList();
     }
 
@@ -32,20 +33,42 @@ public class BillingCycleService {
         BillingCycle cycle = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
                 .orElseThrow();
-        return mapper.toResponseDTO(cycle);
+        return billingCycleMapper.toResponseDTO(cycle);
     }
 
     @Transactional
     public BillingCycleResponseDTO create(User user, BillingCycleDTO dto) {
-        BillingCycle cycle = new BillingCycle();
-        cycle.setUser(user);
-        cycle.setLabel(dto.getLabel());
-        cycle.setCompletedDate(dto.getCompletedDate());
-        List<BillPayment> payments = dto.getBillPaymentIds().stream()
-                .map(id -> billPaymentRepo.findById(id).orElseThrow())
-                .toList();
-        cycle.setBillPayments(payments);
-        return mapper.toResponseDTO(repository.save(cycle));
+        BillingCycle entity = billingCycleMapper.toEntity(dto, user);
+        BillingCycle savedCycle = repository.save(entity);
+
+        List<BillSuggestionDTO> suggestions = billOptimizerService.computeBillSuggestions(user);
+        List<DeferredBill> deferreds = new ArrayList<>();
+
+        for (BillSuggestionDTO suggestion : suggestions) {
+
+            DeferredBill db = new DeferredBill();
+            db.setUser(user);
+            BankAccount from = new BankAccount();
+            from.setId(suggestion.getFrom());
+            db.setFromAccount(from);
+
+            db.setAmount(suggestion.getAmount());
+            db.setBillingCycle(savedCycle);
+
+            if ("card".equals(suggestion.getToType())) {
+                CreditCard toCard = new CreditCard();
+                toCard.setId(suggestion.getTo());
+                db.setToCard(toCard);
+            } else {
+                BankAccount toAccount = new BankAccount();
+                toAccount.setId(suggestion.getTo());
+                db.setToAccount(toAccount);
+            }
+            deferreds.add(db);
+        }
+
+        deferredBillRepo.saveAll(deferreds);
+        return billingCycleMapper.toResponseDTO(savedCycle);
     }
 
     @Transactional
@@ -53,13 +76,13 @@ public class BillingCycleService {
         BillingCycle cycle = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
                 .orElseThrow();
-        mapper.updateEntity(cycle, dto);
+        billingCycleMapper.updateEntity(cycle, dto);
         List<BillPayment> payments = dto.getBillPaymentIds().stream()
                 .map(billPaymentRepo::findById)
                 .map(Optional::orElseThrow)
                 .toList();
         cycle.setBillPayments(payments);
-        return mapper.toResponseDTO(repository.save(cycle));
+        return billingCycleMapper.toResponseDTO(repository.save(cycle));
     }
 
     @Transactional
@@ -73,5 +96,11 @@ public class BillingCycleService {
 
     public String setNewBillingCycleDefaultLabel(LocalDate date) {
         return date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH) + " " + date.getYear();
+    }
+
+    public List<DeferredBillResponseDTO> getDeferredBills(User user, UUID billingCycleId) {
+        return deferredBillRepo.findByUserIdAndBillingCycleId(user.getId(), billingCycleId).stream()
+                .map(deferredBillMapper::toResponseDto)
+                .toList();
     }
 }

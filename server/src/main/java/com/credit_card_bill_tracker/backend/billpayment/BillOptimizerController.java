@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/bills/optimizer")
@@ -15,7 +15,7 @@ public class BillOptimizerController {
     private final BillOptimizerService service;
 
     @GetMapping
-    public Map<String, Double> getOptimized(@AuthenticationPrincipal User user) {
-        return service.computeBills(user);
+    public List<BillSuggestionDTO> getOptimized(@AuthenticationPrincipal User user) {
+        return service.computeBillSuggestions(user);
     }
 }

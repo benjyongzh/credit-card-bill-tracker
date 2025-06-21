@@ -56,8 +56,9 @@ public class BillPaymentService {
         billPaymentRepository.delete(entity);
     }
 
-    public void markBillsComplete(User user) {
+    public BillingCycleResponseDTO markBillsComplete(User user) {
         List<BillPayment> inProgress = billPaymentRepository.findByUserIdAndCompletedFalse(user.getId());
+        if (inProgress.isEmpty()) throw new IllegalStateException("No bill payments to complete.");
         for (BillPayment bp : inProgress) {
             bp.setCompleted(true);
         }
@@ -67,7 +68,7 @@ public class BillPaymentService {
         LocalDate now = LocalDate.now();
         cycle.setCompletedDate(now);
         cycle.setLabel(cycleService.setNewBillingCycleDefaultLabel(now));
-        cycleService.create(user, cycle);
+        return cycleService.create(user, cycle);
     }
 }
 

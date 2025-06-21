@@ -1,5 +1,6 @@
 package com.credit_card_bill_tracker.backend.billpayment;
 
+import com.credit_card_bill_tracker.backend.billingcycle.BillingCycleResponseDTO;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,7 +37,7 @@ public class BillPaymentController {
     }
 
     @PostMapping("/complete")
-    public void markAsComplete(@AuthenticationPrincipal User user) {
-        service.markBillsComplete(user);
+    public BillingCycleResponseDTO markAsComplete(@AuthenticationPrincipal User user) {
+        return service.markBillsComplete(user);
     }
 }
