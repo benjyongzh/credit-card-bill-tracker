@@ -3,6 +3,7 @@ package com.credit_card_bill_tracker.backend.billingcycle;
 import com.credit_card_bill_tracker.backend.billpayment.BillPayment;
 import com.credit_card_bill_tracker.backend.billpayment.BillPaymentMapper;
 import com.credit_card_bill_tracker.backend.billpayment.BillPaymentRepository;
+import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,8 @@ public class BillingCycleMapper {
         entity.setLabel(dto.getLabel());
         entity.setCompletedDate(dto.getCompletedDate());
         List<BillPayment> payments = dto.getBillPaymentIds().stream()
-                .map(id -> billPaymentRepo.findById(id).orElseThrow())
+                .map(id -> billPaymentRepo.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Bill payment not found")))
                 .toList();
         entity.setBillPayments(payments);
         return entity;
@@ -31,7 +33,8 @@ public class BillingCycleMapper {
         entity.setLabel(dto.getLabel());
         entity.setCompletedDate(dto.getCompletedDate());
         List<BillPayment> payments = dto.getBillPaymentIds().stream()
-                .map(id -> billPaymentRepo.findById(id).orElseThrow())
+                .map(id -> billPaymentRepo.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Bill payment not found")))
                 .toList();
         entity.setBillPayments(payments);
     }

@@ -1,7 +1,9 @@
 package com.credit_card_bill_tracker.backend.billpayment;
 
+import com.credit_card_bill_tracker.backend.common.ApiResponse;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +17,9 @@ public class BillOptimizerController {
     private final BillOptimizerService service;
 
     @GetMapping
-    public List<BillSuggestionDTO> getOptimized(@AuthenticationPrincipal User user) {
-        return service.computeBillSuggestions(user);
+    public ResponseEntity<ApiResponse<List<BillSuggestionDTO>>> getOptimized(@AuthenticationPrincipal User user) {
+        List<BillSuggestionDTO> result = service.computeBillSuggestions(user);
+        ApiResponse<List<BillSuggestionDTO>> response = new ApiResponse<>(true, "Bill suggestions retrieved successfully", result);
+        return ResponseEntity.ok(response);
     }
 }

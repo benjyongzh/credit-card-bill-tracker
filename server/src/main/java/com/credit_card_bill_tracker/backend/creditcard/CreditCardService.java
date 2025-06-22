@@ -1,5 +1,6 @@
 package com.credit_card_bill_tracker.backend.creditcard;
 
+import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class CreditCardService {
     public CreditCardResponseDTO update(User user, UUID id, CreditCardDTO dto) {
         CreditCard card = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Credit card not found"));
 
         mapper.updateEntityFromDto(card, dto);
         return mapper.toResponseDto(repository.save(card));
@@ -37,7 +38,7 @@ public class CreditCardService {
 
     public void deleteCard(UUID id) {
         CreditCard card = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Card not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Credit card not found"));
         card.setDeleted(true);
         repository.save(card);
     }

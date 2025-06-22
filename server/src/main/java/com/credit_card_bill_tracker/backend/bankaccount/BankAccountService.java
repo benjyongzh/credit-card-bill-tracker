@@ -1,5 +1,6 @@
 package com.credit_card_bill_tracker.backend.bankaccount;
 
+import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCardRepository;
 import com.credit_card_bill_tracker.backend.user.User;
@@ -31,7 +32,7 @@ public class BankAccountService {
 
         if (dto.getDefaultCardId() != null) {
             CreditCard card = creditCardRepo.findById(dto.getDefaultCardId())
-                    .orElseThrow(() -> new RuntimeException("Card not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
             account.setDefaultCard(card);
         }
         if (dto.isDefault() && bankAccountRepo.existsByUserIdAndIsDefaultTrueAndDeletedFalse(user.getId())) {
@@ -52,13 +53,13 @@ public class BankAccountService {
     public BankAccountResponseDTO update(User user, UUID id, BankAccountDTO dto) {
         BankAccount account = bankAccountRepo.findById(id)
                 .filter(a -> a.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Bank account not found"));
 
         mapper.updateEntityFromDto(account, dto);
 
         if (dto.getDefaultCardId() != null) {
             CreditCard card = creditCardRepo.findById(dto.getDefaultCardId())
-                    .orElseThrow(() -> new RuntimeException("Card not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
             account.setDefaultCard(card);
         } else {
             account.setDefaultCard(null);
@@ -70,7 +71,7 @@ public class BankAccountService {
     public void delete(User user, UUID id) {
         BankAccount account = bankAccountRepo.findById(id)
                 .filter(a -> a.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Bank account not found"));
         account.setDeleted(true);
         bankAccountRepo.save(account);
     }

@@ -2,6 +2,7 @@ package com.credit_card_bill_tracker.backend.billingcycle;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.billpayment.*;
+import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.user.User;
 import jakarta.transaction.Transactional;
@@ -32,7 +33,7 @@ public class BillingCycleService {
     public BillingCycleResponseDTO getById(User user, UUID id) {
         BillingCycle cycle = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Billing cycle not found"));
         return billingCycleMapper.toResponseDTO(cycle);
     }
 
@@ -75,11 +76,11 @@ public class BillingCycleService {
     public BillingCycleResponseDTO update(User user, UUID id, BillingCycleDTO dto) {
         BillingCycle cycle = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Billing cycle not found"));
         billingCycleMapper.updateEntity(cycle, dto);
         List<BillPayment> payments = dto.getBillPaymentIds().stream()
                 .map(billPaymentRepo::findById)
-                .map(Optional::orElseThrow)
+                .map(optional -> optional.orElseThrow(() -> new ResourceNotFoundException("Bill payment not found")))
                 .toList();
         cycle.setBillPayments(payments);
         return billingCycleMapper.toResponseDTO(repository.save(cycle));
@@ -89,7 +90,7 @@ public class BillingCycleService {
     public void delete(User user, UUID id) {
         BillingCycle cycle = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Billing cycle not found"));
         cycle.setDeleted(true);
         repository.save(cycle);
     }

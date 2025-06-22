@@ -1,6 +1,7 @@
 package com.credit_card_bill_tracker.backend.spendingprofile;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccountRepository;
+import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,8 @@ public class SpendingProfileService {
         SpendingProfile profile = mapper.fromDto(dto);
         profile.setUser(user);
         profile.setBankAccounts(dto.getBankAccountIds().stream()
-                .map(id -> bankAccountRepo.findById(id).orElseThrow())
+                .map(id -> bankAccountRepo.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Bank account not found")))
                 .collect(Collectors.toList()));
         return mapper.toResponseDto(repository.save(profile));
     }
@@ -36,11 +38,11 @@ public class SpendingProfileService {
     public SpendingProfileResponseDTO update(User user, UUID id, SpendingProfileDTO dto) {
         SpendingProfile entity = repository.findById(id)
                 .filter(p -> p.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Spending profile not found"));
         mapper.updateEntityFromDto(entity, dto);
         entity.setBankAccounts(dto.getBankAccountIds().stream()
                 .map(bankAccountRepo::findById)
-                .map(Optional::orElseThrow)
+                .map(optional -> optional.orElseThrow(() -> new ResourceNotFoundException("Bank account not found")))
                 .collect(Collectors.toList()));
         return mapper.toResponseDto(repository.save(entity));
     }
@@ -48,7 +50,7 @@ public class SpendingProfileService {
     public void delete(User user, UUID id) {
         SpendingProfile profile = repository.findById(id)
                 .filter(p -> p.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Spending profile not found"));
         profile.setDeleted(true);
         repository.save(profile);
     }

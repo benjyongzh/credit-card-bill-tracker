@@ -1,7 +1,9 @@
 package com.credit_card_bill_tracker.backend.bankaccount;
 
+import com.credit_card_bill_tracker.backend.common.ApiResponse;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,22 +18,30 @@ public class BankAccountController {
     private final BankAccountService service;
 
     @GetMapping
-    public List<BankAccountResponseDTO> getAll(@AuthenticationPrincipal User user) {
-        return service.getAll(user);
+    public ResponseEntity<ApiResponse<List<BankAccountResponseDTO>>> getAll(@AuthenticationPrincipal User user) {
+        List<BankAccountResponseDTO> result = service.getAll(user);
+        ApiResponse<List<BankAccountResponseDTO>> response = new ApiResponse<>(true, "Bank accounts retrieved successfully", result);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public BankAccountResponseDTO create(@AuthenticationPrincipal User user, @RequestBody BankAccountDTO dto) {
-        return service.create(user, dto);
+    public ResponseEntity<ApiResponse<BankAccountResponseDTO>> create(@AuthenticationPrincipal User user, @RequestBody BankAccountDTO dto) {
+        BankAccountResponseDTO result = service.create(user, dto);
+        ApiResponse<BankAccountResponseDTO> response = new ApiResponse<>(true, "Bank account created successfully", result);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public BankAccountResponseDTO update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BankAccountDTO dto) {
-        return service.update(user, id, dto);
+    public ResponseEntity<ApiResponse<BankAccountResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BankAccountDTO dto) {
+        BankAccountResponseDTO result = service.update(user, id, dto);
+        ApiResponse<BankAccountResponseDTO> response = new ApiResponse<>(true, "Bank account updated successfully", result);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+    public ResponseEntity<ApiResponse<Void>> delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
         service.delete(user, id);
+        ApiResponse<Void> response = new ApiResponse<>(true, "Bank account deleted successfully", null);
+        return ResponseEntity.ok(response);
     }
 }

@@ -2,6 +2,8 @@ package com.credit_card_bill_tracker.backend.billpayment;
 
 import com.credit_card_bill_tracker.backend.billingcycle.*;
 import com.credit_card_bill_tracker.backend.common.BaseEntity;
+import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
+import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,10 +36,10 @@ public class BillPaymentService {
     public BillPaymentResponseDTO update(User user, UUID id, BillPaymentDTO dto) {
         BillPayment entity = billPaymentRepository.findById(id)
                 .filter(bp -> bp.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Bill payment not found"));
 
         if (entity.isCompleted()) {
-            throw new IllegalStateException("Cannot edit a completed bill payment.");
+            throw new BadRequestException("Cannot edit a completed bill payment.");
         }
 
         billPaymentMapper.updateEntityFromDto(entity, dto);
@@ -47,10 +49,10 @@ public class BillPaymentService {
     public void delete(User user, UUID id) {
         BillPayment entity = billPaymentRepository.findById(id)
                 .filter(bp -> bp.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Bill payment not found"));
 
         if (entity.isCompleted()) {
-            throw new IllegalStateException("Cannot delete a completed bill payment.");
+            throw new BadRequestException("Cannot delete a completed bill payment.");
         }
 
         billPaymentRepository.delete(entity);
@@ -58,7 +60,7 @@ public class BillPaymentService {
 
     public BillingCycleResponseDTO markBillsComplete(User user) {
         List<BillPayment> inProgress = billPaymentRepository.findByUserIdAndCompletedFalse(user.getId());
-        if (inProgress.isEmpty()) throw new IllegalStateException("No bill payments to complete.");
+        if (inProgress.isEmpty()) throw new BadRequestException("No bill payments to complete.");
         for (BillPayment bp : inProgress) {
             bp.setCompleted(true);
         }
@@ -71,4 +73,3 @@ public class BillPaymentService {
         return cycleService.create(user, cycle);
     }
 }
-
