@@ -24,14 +24,14 @@ public class ExpenseController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ExpenseDTO>> create(@AuthenticationPrincipal User user, @RequestBody ExpenseDTO dto) {
-        ExpenseDTO result = service.create(user, dto);
-        ApiResponse<ExpenseDTO> response = new ApiResponse<>(true, "Expense created successfully", result);
-        return ResponseEntity.ok(response);
-    }
+//    @PostMapping
+//    public ResponseEntity<ApiResponse<ExpenseDTO>> create(@AuthenticationPrincipal User user, @RequestBody ExpenseDTO dto) {
+//        ExpenseDTO result = service.create(user, dto);
+//        ApiResponse<ExpenseDTO> response = new ApiResponse<>(true, "Expense created successfully", result);
+//        return ResponseEntity.ok(response);
+//    }
 
-    @PostMapping("/with-profile")
+    @PostMapping
     public ResponseEntity<ApiResponse<ExpenseDTO>> createExpenseWithProfile(
             @AuthenticationPrincipal User user,
             @RequestParam UUID spendingProfileId,

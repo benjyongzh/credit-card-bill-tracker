@@ -4,6 +4,7 @@ import com.credit_card_bill_tracker.backend.billingcycle.*;
 import com.credit_card_bill_tracker.backend.common.BaseEntity;
 import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
 import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
+import com.credit_card_bill_tracker.backend.expensesummary.ExpenseSummaryService;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class BillPaymentService {
     private final BillPaymentRepository billPaymentRepository;
     private final BillPaymentMapper billPaymentMapper;
     private final BillingCycleService cycleService;
+    private final ExpenseSummaryService summaryService;
 
     public List<BillPaymentResponseDTO> getAll(User user) {
         return billPaymentRepository.findByUserId(user.getId()).stream()
@@ -30,20 +32,26 @@ public class BillPaymentService {
         BillPayment entity = billPaymentMapper.fromDto(dto);
         entity.setUser(user);
         entity.setCompleted(false);
-        return billPaymentMapper.toResponseDto(billPaymentRepository.save(entity));
+
+        BillPayment saved = billPaymentRepository.save(entity);
+        summaryService.updateFromBillPayment(user, saved, true);
+
+        return billPaymentMapper.toResponseDto(saved);
     }
 
     public BillPaymentResponseDTO update(User user, UUID id, BillPaymentDTO dto) {
-        BillPayment entity = billPaymentRepository.findById(id)
-                .filter(bp -> bp.getUser().getId().equals(user.getId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Bill payment not found"));
+        BillPayment existing = billPaymentRepository.findById(id)
+                .filter(p -> p.getUser().getId().equals(user.getId()))
+                .orElseThrow();
 
-        if (entity.isCompleted()) {
-            throw new BadRequestException("Cannot edit a completed bill payment.");
-        }
+        summaryService.updateFromBillPayment(user, existing, false); // reverse old
 
-        billPaymentMapper.updateEntityFromDto(entity, dto);
-        return billPaymentMapper.toResponseDto(billPaymentRepository.save(entity));
+        billPaymentMapper.updateEntityFromDto(existing, dto);
+        BillPayment saved = billPaymentRepository.save(existing);
+
+        summaryService.updateFromBillPayment(user, saved, true); // apply new
+
+        return billPaymentMapper.toResponseDto(saved);
     }
 
     public void delete(User user, UUID id) {
@@ -51,11 +59,12 @@ public class BillPaymentService {
                 .filter(bp -> bp.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Bill payment not found"));
 
-        if (entity.isCompleted()) {
-            throw new BadRequestException("Cannot delete a completed bill payment.");
-        }
-
-        billPaymentRepository.delete(entity);
+//        if (entity.isCompleted()) {
+//            throw new BadRequestException("Cannot delete a completed bill payment.");
+//        }
+        summaryService.updateFromBillPayment(user, entity, false);
+        entity.setDeleted(true);
+        billPaymentRepository.save(entity);
     }
 
     public BillingCycleResponseDTO markBillsComplete(User user) {
