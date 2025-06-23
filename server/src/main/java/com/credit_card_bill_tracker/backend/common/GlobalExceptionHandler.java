@@ -10,9 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -22,7 +20,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(
                 "Not Found",
                 ex.getMessage(),
-                null
+                ex.getDetails()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
@@ -32,7 +30,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(
                 "Bad Request",
                 ex.getMessage(),
-                null
+                ex.getDetails()
         );
         return ResponseEntity.badRequest().body(error);
     }
@@ -42,7 +40,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(
                 "Unauthorized",
                 ex.getMessage(),
-                null
+                ex.getDetails()
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
@@ -52,7 +50,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(
                 "Application Error",
                 ex.getMessage(),
-                null
+                ex.getDetails()
         );
         return ResponseEntity.status(ex.getStatusCode()).body(error);
     }
