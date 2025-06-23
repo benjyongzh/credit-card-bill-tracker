@@ -2,20 +2,19 @@ package com.credit_card_bill_tracker.backend.expensesummary;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.common.BaseEntity;
+import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.user.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "expense_summaries")
+@Table(name = "expense_summaries", uniqueConstraints = @jakarta.persistence.UniqueConstraint(columnNames = {"user_id", "from_account_id", "to_card_id", "to_account_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,9 +27,11 @@ public class ExpenseSummary extends BaseEntity {
     private BankAccount fromAccount;
 
     @ManyToOne
+    @JoinColumn(name = "to_card_id")
     private CreditCard toCard;
 
     @ManyToOne
+    @JoinColumn(name = "to_account_id")
     private BankAccount toAccount;
 
     public String getToType() {
@@ -64,6 +65,14 @@ public class ExpenseSummary extends BaseEntity {
             this.totalPaid += amount;
         } else {
             this.totalPaid -= amount;
+        }
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void validateToFields() {
+        if ((toCard == null && toAccount == null) || (toCard != null && toAccount != null)) {
+            throw new BadRequestException("Exactly one of toCard or toAccount must be set.", List.of("Expense Summary: " + this.getId()));
         }
     }
 }
