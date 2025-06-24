@@ -63,7 +63,7 @@ public class ExpenseService {
         SpendingProfile profile = spendingProfileRepo.findById(spendingProfileId)
                 .filter(p -> p.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new BadRequestException("Invalid spending profile"));
-
+        entity.setBankAccounts(profile.getBankAccounts());
         Expense saved = repository.save(entity);
         summaryService.updateFromExpense(user, saved, true);
 
