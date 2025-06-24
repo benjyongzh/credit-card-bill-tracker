@@ -5,6 +5,9 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -15,6 +18,14 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@FilterDef(
+        name = "softDeleteFilter",
+        parameters = @ParamDef(name = "now", type = LocalDateTime.class)
+)
+@Filter(
+        name = "softDeleteFilter",
+        condition = "deleted_at IS NULL OR deleted_at > :now"
+)
 public abstract class Auditable {
 
     @CreatedDate
@@ -24,5 +35,9 @@ public abstract class Auditable {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private boolean deleted = false;
+    private LocalDateTime deletedAt;
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }

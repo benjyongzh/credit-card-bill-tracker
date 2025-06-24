@@ -16,7 +16,7 @@ public class CreditCardService {
     private final CreditCardMapper mapper;
 
     public List<CreditCardResponseDTO> getAll(User user) {
-        return repository.findByUserIdAndDeletedFalse(user.getId()).stream()
+        return repository.findByUserId(user.getId()).stream()
                 .map(mapper::toResponseDto)
                 .toList();
     }
@@ -39,7 +39,7 @@ public class CreditCardService {
     public void deleteCard(UUID id) {
         CreditCard card = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Credit card not found"));
-        card.setDeleted(true);
+        card.softDelete();
         repository.save(card);
     }
 }

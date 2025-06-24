@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,7 @@ public class SpendingProfileService {
     private final BankAccountRepository bankAccountRepo;
 
     public List<SpendingProfileResponseDTO> getAll(User user) {
-        return repository.findByUserIdAndDeletedFalse(user.getId()).stream()
+        return repository.findByUserId(user.getId()).stream()
                 .map(mapper::toResponseDto)
                 .toList();
     }
@@ -51,7 +50,7 @@ public class SpendingProfileService {
         SpendingProfile profile = repository.findById(id)
                 .filter(p -> p.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Spending profile not found"));
-        profile.setDeleted(true);
+        profile.softDelete();
         repository.save(profile);
     }
 }

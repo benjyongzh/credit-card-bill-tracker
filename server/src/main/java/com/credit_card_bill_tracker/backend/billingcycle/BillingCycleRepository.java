@@ -1,12 +1,12 @@
 package com.credit_card_bill_tracker.backend.billingcycle;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.credit_card_bill_tracker.backend.common.BaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface BillingCycleRepository extends JpaRepository<BillingCycle, UUID> {
-    List<BillingCycle> findByUserIdAndDeletedFalse(UUID userId);
+public interface BillingCycleRepository extends BaseRepository<BillingCycle, UUID> {
+    List<BillingCycle> findByUserId(UUID userId);
 }

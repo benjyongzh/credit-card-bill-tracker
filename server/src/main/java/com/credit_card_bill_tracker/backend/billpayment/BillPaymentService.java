@@ -63,7 +63,7 @@ public class BillPaymentService {
 //            throw new BadRequestException("Cannot delete a completed bill payment.");
 //        }
         summaryService.updateFromBillPayment(user, entity, false);
-        entity.setDeleted(true);
+        entity.softDelete();
         billPaymentRepository.save(entity);
     }
 

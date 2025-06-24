@@ -25,7 +25,7 @@ public class BillingCycleService {
     private final BillOptimizerService billOptimizerService;
 
     public List<BillingCycleResponseDTO> getAll(User user) {
-        return repository.findByUserIdAndDeletedFalse(user.getId()).stream()
+        return repository.findByUserId(user.getId()).stream()
                 .map(billingCycleMapper::toResponseDTO)
                 .toList();
     }
@@ -91,7 +91,7 @@ public class BillingCycleService {
         BillingCycle cycle = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Billing cycle not found"));
-        cycle.setDeleted(true);
+        cycle.softDelete();
         repository.save(cycle);
     }
 

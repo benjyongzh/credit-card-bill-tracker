@@ -20,7 +20,7 @@ public class BankAccountService {
     private final BankAccountMapper mapper;
 
     public List<BankAccountResponseDTO> getAll(User user) {
-        return bankAccountRepo.findByUserIdAndDeletedFalse(user.getId()).stream()
+        return bankAccountRepo.findByUserId(user.getId()).stream()
                 .map(mapper::toResponseDto)
                 .toList();
     }
@@ -35,8 +35,8 @@ public class BankAccountService {
                     .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
             account.setDefaultCard(card);
         }
-        if (dto.isDefault() && bankAccountRepo.existsByUserIdAndIsDefaultTrueAndDeletedFalse(user.getId())) {
-            List<BankAccount> existingAccounts = bankAccountRepo.findByUserIdAndDeletedFalse(user.getId());
+        if (dto.isDefault() && bankAccountRepo.existsByUserIdAndIsDefaultTrue(user.getId())) {
+            List<BankAccount> existingAccounts = bankAccountRepo.findByUserId(user.getId());
             for (BankAccount acc : existingAccounts) {
                 acc.setIsDefault(false);
             }
@@ -72,7 +72,7 @@ public class BankAccountService {
         BankAccount account = bankAccountRepo.findById(id)
                 .filter(a -> a.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Bank account not found"));
-        account.setDeleted(true);
+        account.softDelete();
         bankAccountRepo.save(account);
     }
 }

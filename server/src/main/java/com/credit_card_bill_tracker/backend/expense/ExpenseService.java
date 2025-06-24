@@ -4,21 +4,16 @@ import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccountRepository;
 import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
 import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
-import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCardRepository;
 import com.credit_card_bill_tracker.backend.expensesummary.ExpenseSummaryService;
 import com.credit_card_bill_tracker.backend.spendingprofile.SpendingProfile;
 import com.credit_card_bill_tracker.backend.spendingprofile.SpendingProfileRepository;
 import com.credit_card_bill_tracker.backend.user.User;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,11 +28,11 @@ public class ExpenseService {
 
     public List<ExpenseResponseDTO> getAll(User user, UUID cardId) {
         if (cardId != null) {
-            return repository.findByUserIdAndCreditCardIdAndDeletedFalse(user.getId(), cardId).stream()
+            return repository.findByUserIdAndCreditCardId(user.getId(), cardId).stream()
                     .map(mapper::toResponseDto)
                     .toList();
         } else {
-            return repository.findByUserIdAndDeletedFalse(user.getId()).stream()
+            return repository.findByUserId(user.getId()).stream()
                     .map(mapper::toResponseDto)
                     .toList();
         }
@@ -100,7 +95,7 @@ public class ExpenseService {
                 .filter(e -> e.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
         summaryService.updateFromExpense(user, entity, false);
-        entity.setDeleted(true);
+        entity.softDelete();
         repository.save(entity);
     }
 }
