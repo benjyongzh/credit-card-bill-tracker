@@ -18,6 +18,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException ex) {
         ApiError error = new ApiError(
+                HttpStatus.NOT_FOUND.value(),
                 "Not Found",
                 ex.getMessage(),
                 ex.getDetails()
@@ -28,6 +29,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiError> handleBadRequest(BadRequestException ex) {
         ApiError error = new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
                 ex.getMessage(),
                 ex.getDetails()
@@ -38,6 +40,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiError> handleUnauthorized(UnauthorizedException ex) {
         ApiError error = new ApiError(
+                HttpStatus.UNAUTHORIZED.value(),
                 "Unauthorized",
                 ex.getMessage(),
                 ex.getDetails()
@@ -48,6 +51,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ApiError> handleAppException(AppException ex) {
         ApiError error = new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Application Error",
                 ex.getMessage(),
                 ex.getDetails()
@@ -62,6 +66,7 @@ public class GlobalExceptionHandler {
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .toList();
         ApiError error = new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
                 "Validation Error",
                 "One or more fields are invalid.",
                 errors
@@ -72,6 +77,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiError> handleRuntime(RuntimeException ex) {
         ApiError error = new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Runtime Error",
                 ex.getMessage(),
                 null
@@ -82,6 +88,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGeneral(Exception ex) {
         ApiError error = new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
                 ex.getMessage(),
                 null

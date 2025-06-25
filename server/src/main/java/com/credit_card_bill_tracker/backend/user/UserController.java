@@ -1,6 +1,7 @@
 package com.credit_card_bill_tracker.backend.user;
 
 import com.credit_card_bill_tracker.backend.common.ApiResponse;
+import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponseDTO>> register(@Valid @RequestBody UserDTO dto) {
         UserResponseDTO result = userService.getProfile(userService.register(dto));
-        ApiResponse<UserResponseDTO> response = new ApiResponse<>(true, "User registered successfully", result);
-        return ResponseEntity.ok(response);
+        return ApiResponseBuilder.created(result);
     }
 
     @GetMapping({"", "/{id}"})
@@ -31,7 +31,6 @@ public class UserController {
         } else {
             result = userService.getProfile(currentUser);
         }
-        ApiResponse<UserResponseDTO> response = new ApiResponse<>(true, "User profile retrieved successfully", result);
-        return ResponseEntity.ok(response);
+        return ApiResponseBuilder.ok(result);
     }
 }

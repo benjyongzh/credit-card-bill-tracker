@@ -1,6 +1,7 @@
 package com.credit_card_bill_tracker.backend.expensesummary;
 
 import com.credit_card_bill_tracker.backend.common.ApiResponse;
+import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,6 @@ public class ExpenseSummaryController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<List<ExpenseSummaryResponseDTO>>> getAllFromUserId(@AuthenticationPrincipal User user, @PathVariable UUID id) {
         List<ExpenseSummaryResponseDTO> result = service.getAllSummaries(user, id);
-        ApiResponse<List<ExpenseSummaryResponseDTO>> response = new ApiResponse<>(true, "Expense Summaries retrieved successfully", result);
-        return ResponseEntity.ok(response);
+        return ApiResponseBuilder.ok(result);
     }
 }

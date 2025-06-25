@@ -1,6 +1,7 @@
 package com.credit_card_bill_tracker.backend.auth;
 
 import com.credit_card_bill_tracker.backend.common.ApiResponse;
+import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,13 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponseDTO>> login(@Valid @RequestBody AuthRequestDTO request) {
         String token = authService.login(request.getUsername(), request.getPassword());
         AuthResponseDTO result = new AuthResponseDTO(token);
-        ApiResponse<AuthResponseDTO> response = new ApiResponse<>(true, "Login successful", result);
-        return ResponseEntity.ok(response);
+        return ApiResponseBuilder.ok(result);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        authService.logout(token);
+        return ApiResponseBuilder.noContent();
     }
 }

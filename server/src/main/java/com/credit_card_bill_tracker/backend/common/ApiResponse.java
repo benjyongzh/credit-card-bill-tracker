@@ -1,14 +1,20 @@
 package com.credit_card_bill_tracker.backend.common;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class ApiResponse<T> {
-    private boolean success;
+    private final boolean success = true;
+    private int statusCode;
     private String message;
     private T data;
+
+    public ApiResponse(int statusCode, String message, T data) {
+        this.statusCode = statusCode;
+        this.message = message;
+        this.data = data;
+    }
 }

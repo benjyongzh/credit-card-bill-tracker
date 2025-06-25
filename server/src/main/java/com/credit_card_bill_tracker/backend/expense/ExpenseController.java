@@ -1,6 +1,7 @@
 package com.credit_card_bill_tracker.backend.expense;
 
 import com.credit_card_bill_tracker.backend.common.ApiResponse;
+import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,7 @@ public class ExpenseController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ExpenseResponseDTO>>> get(@AuthenticationPrincipal User user, @RequestParam(required = false) UUID cardId) {
         List<ExpenseResponseDTO> result = service.getAll(user, cardId);
-        ApiResponse<List<ExpenseResponseDTO>> response = new ApiResponse<>(true, "Expenses retrieved successfully", result);
-        return ResponseEntity.ok(response);
+        return ApiResponseBuilder.ok(result);
     }
 
 //    @PostMapping
@@ -38,21 +38,18 @@ public class ExpenseController {
             @RequestBody ExpenseCreateDTO dto
     ) {
         ExpenseDTO result = service.createWithSpendingProfile(user, dto, spendingProfileId);
-        ApiResponse<ExpenseDTO> response = new ApiResponse<>(true, "Expense created with profile successfully", result);
-        return ResponseEntity.ok(response);
+        return ApiResponseBuilder.created(result);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ExpenseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody ExpenseDTO dto) {
         ExpenseDTO result = service.update(user, id, dto);
-        ApiResponse<ExpenseDTO> response = new ApiResponse<>(true, "Expense updated successfully", result);
-        return ResponseEntity.ok(response);
+        return ApiResponseBuilder.accepted(result);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
         service.delete(user, id);
-        ApiResponse<Void> response = new ApiResponse<>(true, "Expense deleted successfully", null);
-        return ResponseEntity.ok(response);
+        return ApiResponseBuilder.noContent();
     }
 }

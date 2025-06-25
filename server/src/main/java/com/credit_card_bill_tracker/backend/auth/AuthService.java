@@ -29,4 +29,10 @@ public class AuthService {
 
         return jwtUtil.generateToken(user.getUsername());
     }
+
+    public void logout(String token) {
+        // Stateless JWT: do nothing, or optionally log the logout event
+        // If you want to support token revocation, save token to a blacklist
+        System.out.println("Logged out token: " + token);
+    }
 }
