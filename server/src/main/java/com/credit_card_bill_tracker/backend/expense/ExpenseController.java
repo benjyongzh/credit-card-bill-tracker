@@ -32,18 +32,18 @@ public class ExpenseController {
 //    }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ExpenseDTO>> createExpenseWithProfile(
+    public ResponseEntity<ApiResponse<ExpenseResponseDTO>> createExpenseWithProfile(
             @AuthenticationPrincipal User user,
             @RequestParam UUID spendingProfileId,
             @RequestBody ExpenseCreateDTO dto
     ) {
-        ExpenseDTO result = service.createWithSpendingProfile(user, dto, spendingProfileId);
+        ExpenseResponseDTO result = service.createWithSpendingProfile(user, dto, spendingProfileId);
         return ApiResponseBuilder.created(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ExpenseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody ExpenseDTO dto) {
-        ExpenseDTO result = service.update(user, id, dto);
+    public ResponseEntity<ApiResponse<ExpenseResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody ExpenseDTO dto) {
+        ExpenseResponseDTO result = service.update(user, id, dto);
         return ApiResponseBuilder.accepted(result);
     }
 

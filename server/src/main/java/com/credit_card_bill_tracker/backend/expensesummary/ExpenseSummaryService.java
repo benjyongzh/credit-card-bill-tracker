@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,45 +31,46 @@ public class ExpenseSummaryService {
 
     @Transactional
     public void updateFromExpense(User user, Expense expense, boolean isAdding) {
-        var fromAccounts = expense.getBankAccounts();
-        var toCard = expense.getCreditCard();
+        List<BankAccount> fromAccounts = expense.getBankAccounts();
+        CreditCard toCard = expense.getCreditCard();
         double splitAmount = expense.getAmount() / fromAccounts.size();
+        List<ExpenseSummary> expenseSummaryList = new ArrayList<>();
 
-        for (var from : fromAccounts) {
+        for (BankAccount from : fromAccounts) {
             ExpenseSummary summary = summaryRepository
-                    .findByUserIdAndFromAccountIdAndToCardId(user.getId(), from.getId(), toCard.getId())
+                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), from.getId(), toCard.getId(), "card")
                     .orElseGet(() -> {
                         ExpenseSummary s = new ExpenseSummary();
                         s.setUser(user);
                         s.setFromAccount(from);
-                        s.setToCard(toCard);
+                        s.setToId(toCard.getId());
+                        s.setToType("card");
                         return s;
                     });
-
             summary.updateExpense(splitAmount, isAdding);
-            summaryRepository.save(summary);
+            expenseSummaryList.add(summary);
+            System.out.println("Updating summary with fromAccountId: " + from.getId());
+            System.out.println("FromAccount Class: " + from.getClass());
         }
+        summaryRepository.saveAll(expenseSummaryList);
     }
 
     @Transactional
     public void updateFromBillPayment(User user, BillPayment payment, boolean isAdding) {
         double delta = isAdding ? payment.getAmount() : -payment.getAmount();
-        UUID fromId = payment.getFromAccount().getId();
+        List<ExpenseSummary> expenseSummaryList = new ArrayList<>();
 
         // Handle payments to Credit Card or Bank Account
         if (payment.getToCard() != null) {
             UUID toCardId = payment.getToCard().getId();
             ExpenseSummary summary = summaryRepository
-                    .findByUserIdAndFromAccountIdAndToCardId(user.getId(), fromId, toCardId)
+                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), payment.getFromAccount().getId(), toCardId, "card")
                     .orElseGet(() -> {
                         ExpenseSummary s = new ExpenseSummary();
                         s.setUser(user);
-                        BankAccount from = new BankAccount();
-                        from.setId(fromId);
-                        s.setFromAccount(from);
-                        CreditCard toCard = new CreditCard();
-                        toCard.setId(toCardId);
-                        s.setToCard(toCard);
+                        s.setFromAccount(payment.getFromAccount());
+                        s.setToId(toCardId);
+                        s.setToType("card");
                         return s;
                     });
             summary.setTotalPaid(summary.getTotalPaid() + delta);
@@ -78,16 +80,13 @@ public class ExpenseSummaryService {
             // special case: paying to another bank account — create a synthetic summary with a virtual card ID
             UUID ToAccountId = payment.getToAccount().getId();
             ExpenseSummary summary = summaryRepository
-                    .findByUserIdAndFromAccountIdAndToAccountId(user.getId(), fromId, ToAccountId)
+                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), payment.getFromAccount().getId(), ToAccountId, "account")
                     .orElseGet(() -> {
                         ExpenseSummary s = new ExpenseSummary();
                         s.setUser(user);
-                        BankAccount from = new BankAccount();
-                        from.setId(fromId);
-                        s.setFromAccount(from);
-                        BankAccount toAccount = new BankAccount();
-                        toAccount.setId(ToAccountId);
-                        s.setToAccount(toAccount);
+                        s.setFromAccount(payment.getFromAccount());
+                        s.setToId(ToAccountId);
+                        s.setToType("account");
                         return s;
                     });
             summary.setTotalPaid(summary.getTotalPaid() + delta);

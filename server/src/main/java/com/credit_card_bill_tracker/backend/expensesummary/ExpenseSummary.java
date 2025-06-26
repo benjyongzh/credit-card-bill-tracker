@@ -3,7 +3,6 @@ package com.credit_card_bill_tracker.backend.expensesummary;
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.common.BaseEntity;
 import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
-import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -26,21 +25,11 @@ public class ExpenseSummary extends BaseEntity {
     @ManyToOne(optional = false)
     private BankAccount fromAccount;
 
-    @ManyToOne
-    @JoinColumn(name = "to_card_id")
-    private CreditCard toCard;
+    @Column(name = "to_id", nullable = false)
+    private UUID toId;
 
-    @ManyToOne
-    @JoinColumn(name = "to_account_id")
-    private BankAccount toAccount;
-
-    public String getToType() {
-        return toCard != null ? "card" : "account";
-    }
-
-    public UUID getToId() {
-        return toCard != null ? toCard.getId() : (toAccount != null ? toAccount.getId() : null);
-    }
+    @Column(name = "to_type", nullable = false)
+    private String toType; // "card" or "account"
 
     @Column(nullable = false)
     private double totalExpense = 0.0;
@@ -71,8 +60,11 @@ public class ExpenseSummary extends BaseEntity {
     @PrePersist
     @PreUpdate
     private void validateToFields() {
-        if ((toCard == null && toAccount == null) || (toCard != null && toAccount != null)) {
-            throw new BadRequestException("Exactly one of toCard or toAccount must be set.", List.of("Expense Summary: " + this.getId()));
+        if (!"card".equals(toType) && !"account".equals(toType)) {
+            throw new BadRequestException("toType must be 'card' or 'account'", List.of("Expense Summary: " + this.getId()));
+        }
+        if (toId == null) {
+            throw new BadRequestException("toId cannot be null", List.of("Expense Summary: " + this.getId()));
         }
     }
 }

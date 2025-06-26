@@ -10,6 +10,5 @@ import java.util.UUID;
 @Repository
 public interface ExpenseSummaryRepository extends BaseRepository<ExpenseSummary, UUID> {
     List<ExpenseSummary> findByUserId(UUID userId);
-    Optional<ExpenseSummary> findByUserIdAndFromAccountIdAndToCardId(UUID userId, UUID fromAccountId, UUID toCardId);
-    Optional<ExpenseSummary> findByUserIdAndFromAccountIdAndToAccountId(UUID userId, UUID fromAccountId, UUID toAccountId);
+    Optional<ExpenseSummary> findByUserIdAndFromAccountIdAndToIdAndToType(UUID userId, UUID fromAccountId, UUID toId, String toType);
 }

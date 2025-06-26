@@ -12,6 +12,7 @@ import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +52,7 @@ public class ExpenseService {
 //        return mapper.toDto(repository.save(entity));
 //    }
 
-    public ExpenseDTO createWithSpendingProfile(User user, ExpenseCreateDTO dto, UUID spendingProfileId) {
+    public ExpenseResponseDTO createWithSpendingProfile(User user, ExpenseCreateDTO dto, UUID spendingProfileId) {
         Expense entity = new Expense();
         entity.setUser(user);
         entity.setCreditCard(creditCardRepo.findById(dto.getCreditCardId())
@@ -63,14 +64,14 @@ public class ExpenseService {
         SpendingProfile profile = spendingProfileRepo.findById(spendingProfileId)
                 .filter(p -> p.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new BadRequestException("Invalid spending profile"));
-        entity.setBankAccounts(profile.getBankAccounts());
+        entity.setBankAccounts(new ArrayList<>(profile.getBankAccounts()));
         Expense saved = repository.save(entity);
         summaryService.updateFromExpense(user, saved, true);
 
-        return mapper.toDto(saved);
+        return mapper.toResponseDto(saved);
     }
 
-    public ExpenseDTO update(User user, UUID id, ExpenseDTO dto) {
+    public ExpenseResponseDTO update(User user, UUID id, ExpenseDTO dto) {
         Expense entity = repository.findById(id)
                 .filter(e -> e.getUser().getId().equals(user.getId()))
                 .orElseThrow();
@@ -82,12 +83,12 @@ public class ExpenseService {
         List<BankAccount> accounts = dto.getBankAccountIds().stream()
                 .map(aid -> bankAccountRepo.findById(aid).orElseThrow())
                 .toList();
-        entity.setBankAccounts(accounts);
+        entity.setBankAccounts(new ArrayList<>(accounts));
 
         Expense saved = repository.save(entity);
         summaryService.updateFromExpense(user, saved, true); // apply new
 
-        return mapper.toDto(saved);
+        return mapper.toResponseDto(saved);
     }
 
     public void delete(User user, UUID id) {

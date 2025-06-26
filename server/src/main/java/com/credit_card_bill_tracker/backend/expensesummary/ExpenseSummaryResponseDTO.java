@@ -8,7 +8,8 @@ import java.util.UUID;
 public class ExpenseSummaryResponseDTO {
     private UUID id;
     private UUID fromAccountId;
-    private UUID toCardId;
+    private UUID toId;
+    private String toType;
     private double totalExpense;
     private double totalPaid;
     private double remaining;

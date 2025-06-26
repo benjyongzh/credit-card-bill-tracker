@@ -25,21 +25,12 @@ public class BillOptimizerService {
                 BillSuggestionDTO suggestion = new BillSuggestionDTO();
                 suggestion.setFrom(summary.getFromAccount().getId());
                 suggestion.setAmount(remaining);
-
-                if (summary.getToCard() != null) {
-                    suggestion.setTo(summary.getToCard().getId());
-                    suggestion.setToType("card");
-                } else if (summary.getToAccount() != null) {
-                    suggestion.setTo(summary.getToAccount().getId());
-                    suggestion.setToType("account");
-                } else {
-                    continue; // invalid state
-                }
-
+                suggestion.setTo(summary.getToId());
+                suggestion.setToType(summary.getToType());
                 suggestions.add(suggestion);
             }
         }
-
+//TODO need to verify correctness and optimisation of this service method
         return suggestions;
     }
 }
