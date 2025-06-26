@@ -58,7 +58,6 @@ public class ExpenseSummaryService {
     @Transactional
     public void updateFromBillPayment(User user, BillPayment payment, boolean isAdding) {
         double delta = isAdding ? payment.getAmount() : -payment.getAmount();
-        List<ExpenseSummary> expenseSummaryList = new ArrayList<>();
 
         // Handle payments to Credit Card or Bank Account
         if (payment.getToCard() != null) {
@@ -73,7 +72,7 @@ public class ExpenseSummaryService {
                         s.setToType("card");
                         return s;
                     });
-            summary.setTotalPaid(summary.getTotalPaid() + delta);
+            summary.updatePayment(delta, isAdding);
             summaryRepository.save(summary);
 
         } else if (payment.getToAccount() != null) {
@@ -89,11 +88,9 @@ public class ExpenseSummaryService {
                         s.setToType("account");
                         return s;
                     });
-            summary.setTotalPaid(summary.getTotalPaid() + delta);
+            summary.updatePayment(delta, isAdding);
             summaryRepository.save(summary);
 
-        } else {
-            return; // invalid state, skip
         }
     }
 }
