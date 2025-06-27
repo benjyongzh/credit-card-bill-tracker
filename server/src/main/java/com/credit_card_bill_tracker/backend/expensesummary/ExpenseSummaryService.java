@@ -22,9 +22,10 @@ public class ExpenseSummaryService {
     private final ExpenseSummaryMapper mapper;
 
     public List<ExpenseSummaryResponseDTO> getAllSummaries(User user, UUID userId) {
-        if (user.getId() != userId) throw new UnauthorizedException("User does not have permission to view other user's summaries.");
+        if (!user.getId().equals(userId))
+            throw new UnauthorizedException("User does not have permission to view other user's summaries.");
 
-        return summaryRepository.findByUserId(user.getId()).stream()
+        return summaryRepository.findByUserId(userId).stream()
                 .map(mapper::toResponseDto)
                 .toList();
     }
