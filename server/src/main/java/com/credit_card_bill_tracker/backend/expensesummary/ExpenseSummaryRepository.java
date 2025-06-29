@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
+
 @Repository
 public interface ExpenseSummaryRepository extends BaseRepository<ExpenseSummary, UUID> {
     List<ExpenseSummary> findByUserId(UUID userId);
-    Optional<ExpenseSummary> findByUserIdAndFromAccountIdAndToIdAndToType(UUID userId, UUID fromAccountId, UUID toId, String toType);
+    Optional<ExpenseSummary> findByUserIdAndFromAccountIdAndToIdAndToType(UUID userId, UUID fromAccountId, UUID toId, TargetType toType);
 }
