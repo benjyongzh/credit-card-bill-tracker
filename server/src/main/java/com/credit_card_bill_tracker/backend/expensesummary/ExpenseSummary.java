@@ -4,6 +4,7 @@ import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.common.BaseEntity;
 import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
 import com.credit_card_bill_tracker.backend.user.User;
+import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,8 +29,9 @@ public class ExpenseSummary extends BaseEntity {
     @Column(name = "to_id", nullable = false)
     private UUID toId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "to_type", nullable = false)
-    private String toType; // "card" or "account"
+    private TargetType toType;
 
     @Column(nullable = false)
     private double totalExpense = 0.0;
@@ -60,8 +62,8 @@ public class ExpenseSummary extends BaseEntity {
     @PrePersist
     @PreUpdate
     private void validateToFields() {
-        if (!"card".equals(toType) && !"account".equals(toType)) {
-            throw new BadRequestException("toType must be 'card' or 'account'", List.of("Expense Summary: " + this.getId()));
+        if (toType == null) {
+            throw new BadRequestException("toType cannot be null", List.of("Expense Summary: " + this.getId()));
         }
         if (toId == null) {
             throw new BadRequestException("toId cannot be null", List.of("Expense Summary: " + this.getId()));

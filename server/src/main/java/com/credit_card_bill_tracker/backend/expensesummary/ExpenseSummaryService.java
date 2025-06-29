@@ -5,6 +5,7 @@ import com.credit_card_bill_tracker.backend.billpayment.BillPayment;
 import com.credit_card_bill_tracker.backend.common.errors.UnauthorizedException;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.expense.Expense;
+import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 import com.credit_card_bill_tracker.backend.user.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +40,13 @@ public class ExpenseSummaryService {
 
         for (BankAccount from : fromAccounts) {
             ExpenseSummary summary = summaryRepository
-                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), from.getId(), toCard.getId(), "card")
+                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), from.getId(), toCard.getId(), TargetType.CARD)
                     .orElseGet(() -> {
                         ExpenseSummary s = new ExpenseSummary();
                         s.setUser(user);
                         s.setFromAccount(from);
                         s.setToId(toCard.getId());
-                        s.setToType("card");
+                        s.setToType(TargetType.CARD);
                         return s;
                     });
             summary.updateExpense(splitAmount, isAdding);
@@ -64,13 +65,13 @@ public class ExpenseSummaryService {
         if (payment.getToCard() != null) {
             UUID toCardId = payment.getToCard().getId();
             ExpenseSummary summary = summaryRepository
-                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), payment.getFromAccount().getId(), toCardId, "card")
+                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), payment.getFromAccount().getId(), toCardId, TargetType.CARD)
                     .orElseGet(() -> {
                         ExpenseSummary s = new ExpenseSummary();
                         s.setUser(user);
                         s.setFromAccount(payment.getFromAccount());
                         s.setToId(toCardId);
-                        s.setToType("card");
+                        s.setToType(TargetType.CARD);
                         return s;
                     });
             summary.updatePayment(delta, isAdding);
@@ -80,13 +81,13 @@ public class ExpenseSummaryService {
             // special case: paying to another bank account — create a synthetic summary with a virtual card ID
             UUID ToAccountId = payment.getToAccount().getId();
             ExpenseSummary summary = summaryRepository
-                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), payment.getFromAccount().getId(), ToAccountId, "account")
+                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), payment.getFromAccount().getId(), ToAccountId, TargetType.ACCOUNT)
                     .orElseGet(() -> {
                         ExpenseSummary s = new ExpenseSummary();
                         s.setUser(user);
                         s.setFromAccount(payment.getFromAccount());
                         s.setToId(ToAccountId);
-                        s.setToType("account");
+                        s.setToType(TargetType.ACCOUNT);
                         return s;
                     });
             summary.updatePayment(delta, isAdding);

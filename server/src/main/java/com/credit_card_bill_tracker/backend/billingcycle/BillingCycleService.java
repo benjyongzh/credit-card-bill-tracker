@@ -2,6 +2,7 @@ package com.credit_card_bill_tracker.backend.billingcycle;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.billpayment.*;
+import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.user.User;
@@ -56,7 +57,7 @@ public class BillingCycleService {
             db.setAmount(suggestion.getAmount());
             db.setBillingCycle(savedCycle);
 
-            if ("card".equals(suggestion.getToType())) {
+            if (suggestion.getToType() == TargetType.CARD) {
                 CreditCard toCard = new CreditCard();
                 toCard.setId(suggestion.getTo());
                 db.setToCard(toCard);

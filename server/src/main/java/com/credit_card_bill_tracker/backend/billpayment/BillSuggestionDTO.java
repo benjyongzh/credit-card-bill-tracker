@@ -4,6 +4,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 
 @Data
 @NoArgsConstructor
@@ -12,5 +13,5 @@ public class BillSuggestionDTO {
     private UUID from;
     private UUID to;
     private double amount;
-    private String toType; //"card" or "account"
+    private TargetType toType;
 }
