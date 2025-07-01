@@ -4,6 +4,7 @@ import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.expensesummary.ExpenseSummary;
 import com.credit_card_bill_tracker.backend.expensesummary.ExpenseSummaryRepository;
+import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 import com.credit_card_bill_tracker.backend.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ public class BillOptimizerServiceTests {
         service = new BillOptimizerService(repository);
     }
 
-    private ExpenseSummary buildSummary(User user, BankAccount from, UUID toId, String toType, double amount) {
+    private ExpenseSummary buildSummary(User user, BankAccount from, UUID toId, TargetType toType, double amount) {
         ExpenseSummary s = new ExpenseSummary();
         s.setUser(user);
         s.setFromAccount(from);
@@ -46,7 +47,7 @@ public class BillOptimizerServiceTests {
         CreditCard card = new CreditCard();
         card.setId(UUID.randomUUID());
 
-        ExpenseSummary summary = buildSummary(user, bank, card.getId(), "card", 100);
+        ExpenseSummary summary = buildSummary(user, bank, card.getId(), TargetType.CARD, 100);
 
         when(repository.findByUserId(user.getId())).thenReturn(List.of(summary));
 
@@ -57,7 +58,7 @@ public class BillOptimizerServiceTests {
         assertEquals(bank.getId(), dto.getFrom());
         assertEquals(card.getId(), dto.getTo());
         assertEquals(100, dto.getAmount());
-        assertEquals("card", dto.getToType());
+        assertEquals(TargetType.CARD, dto.getToType());
     }
 
     @Test
@@ -72,8 +73,8 @@ public class BillOptimizerServiceTests {
         CreditCard card = new CreditCard();
         card.setId(UUID.randomUUID());
 
-        ExpenseSummary s1 = buildSummary(user, a, b.getId(), "account", 50);
-        ExpenseSummary s2 = buildSummary(user, b, card.getId(), "card", 100);
+        ExpenseSummary s1 = buildSummary(user, a, b.getId(), TargetType.ACCOUNT, 50);
+        ExpenseSummary s2 = buildSummary(user, b, card.getId(), TargetType.CARD, 100);
 
         when(repository.findByUserId(user.getId())).thenReturn(List.of(s1, s2));
 
@@ -98,7 +99,7 @@ public class BillOptimizerServiceTests {
         CreditCard card = new CreditCard();
         card.setId(UUID.randomUUID());
 
-        ExpenseSummary summary = buildSummary(user, bank, card.getId(), "card", -50);
+        ExpenseSummary summary = buildSummary(user, bank, card.getId(), TargetType.CARD, -50);
 
         when(repository.findByUserId(user.getId())).thenReturn(List.of(summary));
 
@@ -119,8 +120,8 @@ public class BillOptimizerServiceTests {
         CreditCard card = new CreditCard();
         card.setId(UUID.randomUUID());
 
-        ExpenseSummary overpay = buildSummary(user, a, card.getId(), "card", -20);
-        ExpenseSummary due = buildSummary(user, b, card.getId(), "card", 30);
+        ExpenseSummary overpay = buildSummary(user, a, card.getId(), TargetType.CARD, -20);
+        ExpenseSummary due = buildSummary(user, b, card.getId(), TargetType.CARD, 30);
 
         when(repository.findByUserId(user.getId())).thenReturn(List.of(overpay, due));
 

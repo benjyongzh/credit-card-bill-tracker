@@ -2,6 +2,7 @@ package com.credit_card_bill_tracker.backend.billpayment;
 
 import com.credit_card_bill_tracker.backend.expensesummary.ExpenseSummary;
 import com.credit_card_bill_tracker.backend.expensesummary.ExpenseSummaryRepository;
+import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 import com.credit_card_bill_tracker.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class BillOptimizerService {
         // values mean the card was overpaid and should not influence other
         // accounts' suggestions.
         Map<UUID, Double> remainingMap = new LinkedHashMap<>();
-        Map<UUID, String> typeMap = new HashMap<>();
+        Map<UUID, TargetType> typeMap = new HashMap<>();
 
         for (ExpenseSummary summary : summaries) {
             double remaining = summary.getRemaining();
@@ -36,7 +37,7 @@ public class BillOptimizerService {
 
             UUID fromId = summary.getFromAccount().getId();
             remainingMap.merge(fromId, remaining, Double::sum);
-            typeMap.putIfAbsent(fromId, "account");
+            typeMap.putIfAbsent(fromId, TargetType.ACCOUNT);
 
             UUID toId = summary.getToId();
             remainingMap.merge(toId, -remaining, Double::sum);
@@ -50,7 +51,7 @@ public class BillOptimizerService {
         for (Map.Entry<UUID, Double> entry : remainingMap.entrySet()) {
             double amt = entry.getValue();
             if (amt > 0) {
-                if ("account".equals(typeMap.get(entry.getKey()))) {
+                if (TargetType.ACCOUNT.equals(typeMap.get(entry.getKey()))) {
                     surpluses.put(entry.getKey(), amt);
                 }
             } else if (amt < 0) {
@@ -88,9 +89,9 @@ public class BillOptimizerService {
 
     private static class DeficitInfo {
         double amount; // always positive
-        String type;
+        TargetType type;
 
-        DeficitInfo(double amount, String type) {
+        DeficitInfo(double amount, TargetType type) {
             this.amount = amount;
             this.type = type;
         }

@@ -4,7 +4,6 @@ import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.common.BaseEntity;
 import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
 import com.credit_card_bill_tracker.backend.user.User;
-import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "expense_summaries", uniqueConstraints = @jakarta.persistence.UniqueConstraint(columnNames = {"user_id", "from_account_id", "to_card_id", "to_account_id"}))
+@Table(name = "expense_summaries", uniqueConstraints = @jakarta.persistence.UniqueConstraint(columnNames = {"user_id", "from_account_id", "to_id", "to_type"}))
 @Getter
 @Setter
 @NoArgsConstructor

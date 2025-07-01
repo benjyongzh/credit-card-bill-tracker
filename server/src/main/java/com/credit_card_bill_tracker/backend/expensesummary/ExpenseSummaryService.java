@@ -5,7 +5,6 @@ import com.credit_card_bill_tracker.backend.billpayment.BillPayment;
 import com.credit_card_bill_tracker.backend.common.errors.UnauthorizedException;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.expense.Expense;
-import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 import com.credit_card_bill_tracker.backend.user.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,9 @@ public class ExpenseSummaryService {
 
         for (BankAccount from : fromAccounts) {
             ExpenseSummary summary = summaryRepository
-                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), from.getId(), toCard.getId(), TargetType.CARD)
+                    .findExactNative(
+                            user.getId(), from.getId(), toCard.getId(), TargetType.CARD.name()
+                    )
                     .orElseGet(() -> {
                         ExpenseSummary s = new ExpenseSummary();
                         s.setUser(user);
@@ -65,7 +66,9 @@ public class ExpenseSummaryService {
         if (payment.getToCard() != null) {
             UUID toCardId = payment.getToCard().getId();
             ExpenseSummary summary = summaryRepository
-                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), payment.getFromAccount().getId(), toCardId, TargetType.CARD)
+                    .findExactNative(
+                            user.getId(), payment.getFromAccount().getId(), toCardId, TargetType.CARD.name()
+                    )
                     .orElseGet(() -> {
                         ExpenseSummary s = new ExpenseSummary();
                         s.setUser(user);
@@ -81,7 +84,9 @@ public class ExpenseSummaryService {
             // special case: paying to another bank account — create a synthetic summary with a virtual card ID
             UUID ToAccountId = payment.getToAccount().getId();
             ExpenseSummary summary = summaryRepository
-                    .findByUserIdAndFromAccountIdAndToIdAndToType(user.getId(), payment.getFromAccount().getId(), ToAccountId, TargetType.ACCOUNT)
+                    .findExactNative(
+                            user.getId(), payment.getFromAccount().getId(), ToAccountId, TargetType.ACCOUNT.name()
+                    )
                     .orElseGet(() -> {
                         ExpenseSummary s = new ExpenseSummary();
                         s.setUser(user);
