@@ -43,7 +43,7 @@ public class BillingCycleService {
         BillingCycle entity = billingCycleMapper.toEntity(dto, user);
         BillingCycle savedCycle = repository.save(entity);
 
-        List<BillSuggestionDTO> suggestions = billOptimizerService.computeBillSuggestions(user);
+        List<BillSuggestionDTO> suggestions = billOptimizerService.computeBillSuggestions(user, OptimizationStrategy.MINIMIZE_TRANSACTIONS);
         List<DeferredBill> deferreds = new ArrayList<>();
 
         for (BillSuggestionDTO suggestion : suggestions) {

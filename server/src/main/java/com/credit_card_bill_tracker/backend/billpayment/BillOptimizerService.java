@@ -15,7 +15,7 @@ public class BillOptimizerService {
 
     private final ExpenseSummaryRepository expenseSummaryRepository;
 
-    public List<BillSuggestionDTO> computeBillSuggestions(User user) {
+    public List<BillSuggestionDTO> computeBillSuggestions(User user, OptimizationStrategy strategy) {
         List<ExpenseSummary> summaries = expenseSummaryRepository.findByUserId(user.getId());
 
         // Track the net remaining amount for every account and card.
@@ -59,8 +59,15 @@ public class BillOptimizerService {
             }
         }
 
-        List<BillSuggestionDTO> suggestions = new ArrayList<>();
+        if (strategy == OptimizationStrategy.MINIMIZE_ACCOUNTS) {
+            return minimizeAccounts(surpluses, deficits);
+        } else {
+            return minimizeTransactions(surpluses, deficits);
+        }
+    }
 
+    private List<BillSuggestionDTO> minimizeTransactions(Map<UUID, Double> surpluses, Map<UUID, DeficitInfo> deficits) {
+        List<BillSuggestionDTO> suggestions = new ArrayList<>();
         for (Map.Entry<UUID, Double> surplusEntry : surpluses.entrySet()) {
             double available = surplusEntry.getValue();
             if (available <= 0) continue;
@@ -81,6 +88,40 @@ public class BillOptimizerService {
                 info.amount -= payment;
 
                 if (available <= 0) break;
+            }
+        }
+        return suggestions;
+    }
+
+    private List<BillSuggestionDTO> minimizeAccounts(Map<UUID, Double> surpluses, Map<UUID, DeficitInfo> deficits) {
+        List<BillSuggestionDTO> suggestions = new ArrayList<>();
+        double totalDeficit = deficits.values().stream().mapToDouble(d -> d.amount).sum();
+
+        List<Map.Entry<UUID, Double>> sortedSurpluses = surpluses.entrySet().stream()
+                .sorted(Map.Entry.<UUID, Double>comparingByValue().reversed())
+                .toList();
+
+        for (Map.Entry<UUID, Double> surplusEntry : sortedSurpluses) {
+            if (totalDeficit <= 0) break;
+
+            double available = surplusEntry.getValue();
+            if (available <= 0) continue;
+
+            for (Map.Entry<UUID, DeficitInfo> deficitEntry : deficits.entrySet()) {
+                DeficitInfo info = deficitEntry.getValue();
+                if (info.amount <= 0) continue;
+
+                double payment = Math.min(available, info.amount);
+                suggestions.add(new BillSuggestionDTO(
+                        surplusEntry.getKey(),
+                        deficitEntry.getKey(),
+                        payment,
+                        info.type
+                ));
+
+                available -= payment;
+                info.amount -= payment;
+                totalDeficit -=payment;
             }
         }
 

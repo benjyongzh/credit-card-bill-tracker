@@ -51,7 +51,7 @@ public class BillOptimizerServiceTests {
 
         when(repository.findByUserId(user.getId())).thenReturn(List.of(summary));
 
-        List<BillSuggestionDTO> result = service.computeBillSuggestions(user);
+        List<BillSuggestionDTO> result = service.computeBillSuggestions(user, OptimizationStrategy.MINIMIZE_TRANSACTIONS);
 
         assertEquals(1, result.size());
         BillSuggestionDTO dto = result.get(0);
@@ -78,7 +78,7 @@ public class BillOptimizerServiceTests {
 
         when(repository.findByUserId(user.getId())).thenReturn(List.of(s1, s2));
 
-        List<BillSuggestionDTO> result = service.computeBillSuggestions(user);
+        List<BillSuggestionDTO> result = service.computeBillSuggestions(user, OptimizationStrategy.MINIMIZE_TRANSACTIONS);
 
         assertEquals(2, result.size());
         // total amount to card should equal 100
@@ -103,7 +103,7 @@ public class BillOptimizerServiceTests {
 
         when(repository.findByUserId(user.getId())).thenReturn(List.of(summary));
 
-        List<BillSuggestionDTO> result = service.computeBillSuggestions(user);
+        List<BillSuggestionDTO> result = service.computeBillSuggestions(user, OptimizationStrategy.MINIMIZE_TRANSACTIONS);
 
         assertEquals(0, result.size());
     }
@@ -125,12 +125,43 @@ public class BillOptimizerServiceTests {
 
         when(repository.findByUserId(user.getId())).thenReturn(List.of(overpay, due));
 
-        List<BillSuggestionDTO> result = service.computeBillSuggestions(user);
+        List<BillSuggestionDTO> result = service.computeBillSuggestions(user, OptimizationStrategy.MINIMIZE_TRANSACTIONS);
 
         assertEquals(1, result.size());
         BillSuggestionDTO dto = result.get(0);
         assertEquals(b.getId(), dto.getFrom());
         assertEquals(card.getId(), dto.getTo());
         assertEquals(30, dto.getAmount());
+    }
+
+    @Test
+    void minimizeAccountsPrioritizesLargestSurplus() {
+        User user = new User();
+        user.setId(UUID.randomUUID());
+
+        BankAccount a = new BankAccount();
+        a.setId(UUID.randomUUID());
+        BankAccount b = new BankAccount();
+        b.setId(UUID.randomUUID());
+        BankAccount c = new BankAccount();
+        c.setId(UUID.randomUUID());
+        CreditCard card = new CreditCard();
+        card.setId(UUID.randomUUID());
+
+        ExpenseSummary s1 = buildSummary(user, a, card.getId(), TargetType.CARD, 10);
+        ExpenseSummary s2 = buildSummary(user, b, card.getId(), TargetType.CARD, 100);
+        ExpenseSummary s3 = buildSummary(user, c, card.getId(), TargetType.CARD, 50);
+
+        when(repository.findByUserId(user.getId())).thenReturn(List.of(s1, s2, s3));
+
+        List<BillSuggestionDTO> result = service.computeBillSuggestions(user, OptimizationStrategy.MINIMIZE_ACCOUNTS);
+
+        assertEquals(3, result.size());
+        assertEquals(b.getId(), result.get(0).getFrom());
+        assertEquals(100, result.get(0).getAmount());
+        assertEquals(c.getId(), result.get(1).getFrom());
+        assertEquals(50, result.get(1).getAmount());
+        assertEquals(a.getId(), result.get(2).getFrom());
+        assertEquals(10, result.get(2).getAmount());
     }
 }
