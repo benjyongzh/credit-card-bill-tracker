@@ -3,6 +3,7 @@ package com.credit_card_bill_tracker.backend.bankaccount;
 import com.credit_card_bill_tracker.backend.common.ApiResponse;
 import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
 import com.credit_card_bill_tracker.backend.user.User;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +19,7 @@ public class BankAccountController {
 
     private final BankAccountService service;
 
+    @Operation(summary = "Get all BankAccounts of a User", description = "Returns a list of BankAccounts")
     @GetMapping
     public ResponseEntity<ApiResponse<List<BankAccountResponseDTO>>> getAll(@AuthenticationPrincipal User user) {
         List<BankAccountResponseDTO> result = service.getAll(user);
