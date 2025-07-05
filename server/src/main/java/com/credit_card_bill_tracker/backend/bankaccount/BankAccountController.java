@@ -27,17 +27,22 @@ public class BankAccountController {
     }
 
     @PostMapping
+    @Operation(summary = "Create BankAccount", description = "Adds a new bank account for the authenticated user")
+    @PostMapping
     public ResponseEntity<ApiResponse<BankAccountResponseDTO>> create(@AuthenticationPrincipal User user, @RequestBody BankAccountDTO dto) {
         BankAccountResponseDTO result = service.create(user, dto);
         return ApiResponseBuilder.created(result);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update BankAccount", description = "Modifies an existing bank account identified by id")
+    @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<BankAccountResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BankAccountDTO dto) {
         BankAccountResponseDTO result = service.update(user, id, dto);
         return ApiResponseBuilder.accepted(result);
     }
 
+    @Operation(summary = "Delete BankAccount", description = "Soft deletes the bank account with the given id")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
         service.delete(user, id);
