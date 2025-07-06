@@ -26,7 +26,6 @@ public class BankAccountController {
         return ApiResponseBuilder.ok(result);
     }
 
-    @PostMapping
     @Operation(summary = "Create BankAccount", description = "Adds a new bank account for the authenticated user")
     @PostMapping
     public ResponseEntity<ApiResponse<BankAccountResponseDTO>> create(@AuthenticationPrincipal User user, @RequestBody BankAccountDTO dto) {
@@ -34,7 +33,6 @@ public class BankAccountController {
         return ApiResponseBuilder.created(result);
     }
 
-    @PutMapping("/{id}")
     @Operation(summary = "Update BankAccount", description = "Modifies an existing bank account identified by id")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<BankAccountResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BankAccountDTO dto) {
