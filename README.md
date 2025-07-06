@@ -10,7 +10,12 @@ This repository contains the Spring Boot backend for managing credit card bills 
 
 ## Getting Started
 1. Install **Java 17** and ensure `java -version` reports it.
-2. Copy `server/src/main/resources/application-template.properties` to `server/src/main/resources/application.properties` and edit the database credentials and JWT secret.
+2. Copy `server/src/main/resources/application-template.properties` to `server/src/main/resources/application.properties` and edit the database credentials, JWT secret, and cookie settings.
+   The JWT cookie defaults are:
+   ```properties
+   jwt.cookieName=token
+   jwt.cookieSecure=false
+   ```
 3. From the `server` directory run:
    ```bash
    ./mvnw spring-boot:run

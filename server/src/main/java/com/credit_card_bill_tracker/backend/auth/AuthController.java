@@ -22,17 +22,21 @@ public class AuthController {
     @Value("${jwt.cookieName}")
     private String cookieName;
 
+    @Value("${jwt.cookieSecure:false}")
+    private boolean cookieSecure;
+
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponseDTO>> login(@Valid @RequestBody AuthRequestDTO request,
-                                                              HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<Void>> login(@Valid @RequestBody AuthRequestDTO request,
+                                                   HttpServletResponse response) {
         String token = authService.login(request.getUsername(), request.getPassword());
         ResponseCookie cookie = ResponseCookie.from(cookieName, token)
                 .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite("Strict")
                 .path("/")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        AuthResponseDTO result = new AuthResponseDTO(token);
-        return ApiResponseBuilder.ok(result);
+        return ApiResponseBuilder.noContent();
     }
 
     @PostMapping("/logout")
@@ -48,13 +52,15 @@ public class AuthController {
         }
         if (token != null) {
             authService.logout(token);
-            ResponseCookie cookie = ResponseCookie.from(cookieName, "")
-                    .httpOnly(true)
-                    .path("/")
-                    .maxAge(0)
-                    .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         }
+        ResponseCookie cookie = ResponseCookie.from(cookieName, "")
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite("Strict")
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ApiResponseBuilder.noContent();
     }
 }
