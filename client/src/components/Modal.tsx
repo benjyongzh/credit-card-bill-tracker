@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type {ReactNode} from 'react'
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 

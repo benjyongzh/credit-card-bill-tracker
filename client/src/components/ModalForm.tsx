@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type {ReactNode} from 'react'
 import Modal from './Modal'
 import { DialogClose, useDialog } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'

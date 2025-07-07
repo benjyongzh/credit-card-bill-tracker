@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import {type ReactNode, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'

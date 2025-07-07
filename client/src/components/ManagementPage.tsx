@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import {type ReactNode, useState } from 'react'
 import AppLayout from './AppLayout'
 import { useEntityList } from '@/hooks/useEntityList'
 import ModalForm from './ModalForm'

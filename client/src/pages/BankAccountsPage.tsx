@@ -1,4 +1,4 @@
-import ManagementPage, { Column } from '@/components/ManagementPage'
+import ManagementPage, {type Column } from '@/components/ManagementPage'
 
 interface Account {
   id: string
