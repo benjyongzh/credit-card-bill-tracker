@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button'
 interface ModalFormProps {
   title: string
   triggerLabel: string
-  onSubmit: () => void
+  onSubmit: (data: Record<string, FormDataEntryValue>) => void
   children: ReactNode
   triggerClassName?: string
   contentClassName?: string
+  onOpen?: () => void
 }
 
 export default function ModalForm({
@@ -17,22 +18,24 @@ export default function ModalForm({
   triggerLabel,
   onSubmit,
   children,
+  onOpen,
   ...rest
 }: ModalFormProps) {
   return (
-    <Modal title={title} triggerLabel={triggerLabel} {...rest}>
+    <Modal title={title} triggerLabel={triggerLabel} onOpen={onOpen} {...rest}>
       <FormBody onSubmit={onSubmit}>{children}</FormBody>
     </Modal>
   )
 }
 
-function FormBody({ onSubmit, children }: { onSubmit: () => void; children: ReactNode }) {
+function FormBody({ onSubmit, children }: { onSubmit: (data: Record<string, FormDataEntryValue>) => void; children: ReactNode }) {
   const { setOpen } = useDialog()
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
-        onSubmit()
+        const formData = Object.fromEntries(new FormData(e.currentTarget).entries())
+        onSubmit(formData)
         setOpen(false)
       }}
       className="space-y-4"

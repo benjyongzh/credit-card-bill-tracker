@@ -28,11 +28,17 @@ function Dialog({ open = false, onOpenChange, ...props }: DialogProps) {
   )
 }
 
-function DialogTrigger({ children, className }: { children: React.ReactNode; className?: string }) {
+function DialogTrigger({ children, className, onClick }: { children: React.ReactNode; className?: string; onClick?: () => void }) {
   const ctx = React.useContext(DialogContext)
   if (!ctx) throw new Error('DialogTrigger must be used within Dialog')
   return (
-    <div onClick={() => ctx.setOpen(true)} className={className}>
+    <div
+      onClick={() => {
+        onClick?.()
+        ctx.setOpen(true)
+      }}
+      className={className}
+    >
       {children}
     </div>
   )

@@ -8,6 +8,7 @@ interface ModalProps {
   children: ReactNode
   triggerClassName?: string
   contentClassName?: string
+  onOpen?: () => void
 }
 
 export default function Modal({
@@ -16,10 +17,11 @@ export default function Modal({
   children,
   triggerClassName,
   contentClassName,
+  onOpen,
 }: ModalProps) {
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger onClick={onOpen}>
         <Button className={triggerClassName}>{triggerLabel}</Button>
       </DialogTrigger>
       <DialogContent className={contentClassName}>

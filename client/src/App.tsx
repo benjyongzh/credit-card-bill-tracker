@@ -1,6 +1,9 @@
 import { Route, Routes, Navigate } from 'react-router-dom'
 import AppLayout from './components/AppLayout'
 import LoginPage from './pages/LoginPage'
+import CreditCardsPage from './pages/CreditCardsPage'
+import BankAccountsPage from './pages/BankAccountsPage'
+import SpendingProfilesPage from './pages/SpendingProfilesPage'
 import { useAuthStore } from './store/auth'
 
 function Dashboard() {
@@ -19,6 +22,9 @@ export default function App() {
           <AppLayout>
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/credit-cards" element={<CreditCardsPage />} />
+              <Route path="/bank-accounts" element={<BankAccountsPage />} />
+              <Route path="/spending-profiles" element={<SpendingProfilesPage />} />
               <Route path="*" element={<Navigate to="/dashboard" />} />
             </Routes>
           </AppLayout>
