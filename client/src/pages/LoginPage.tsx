@@ -9,7 +9,7 @@ export default function LoginPage() {
 
   const googleLogin = () => {
     const base = import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
-    window.location.href = `${base}/oauth2/authorization/google`
+    window.location.href = `${base}${import.meta.env.VITE_OAUTH_LOGIN_CALLBACK_URL}`
   }
 
   const onSubmit = async (e: FormEvent) => {
