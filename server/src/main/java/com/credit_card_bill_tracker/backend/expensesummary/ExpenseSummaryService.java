@@ -8,6 +8,7 @@ import com.credit_card_bill_tracker.backend.expense.Expense;
 import com.credit_card_bill_tracker.backend.user.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExpenseSummaryService {
 
     private final ExpenseSummaryRepository summaryRepository;
@@ -52,8 +54,8 @@ public class ExpenseSummaryService {
                     });
             summary.updateExpense(splitAmount, isAdding);
             expenseSummaryList.add(summary);
-            System.out.println("Updating summary with fromAccountId: " + from.getId());
-            System.out.println("FromAccount Class: " + from.getClass());
+            log.debug("Updating summary with fromAccountId: {}", from.getId());
+            log.debug("FromAccount Class: {}", from.getClass());
         }
         summaryRepository.saveAll(expenseSummaryList);
     }

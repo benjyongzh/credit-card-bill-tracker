@@ -6,8 +6,10 @@ import com.credit_card_bill_tracker.backend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class AuthService {
 
     @Autowired
@@ -26,13 +28,14 @@ public class AuthService {
         if (!passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
             throw new UnauthorizedException("Invalid username or password");
         }
-
-        return jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(user.getUsername());
+        log.info("User {} logged in", username);
+        return token;
     }
 
     public void logout(String token) {
         // Stateless JWT: do nothing, or optionally log the logout event
         // If you want to support token revocation, save token to a blacklist
-        System.out.println("Logged out token: " + token);
+        log.info("Logged out token {}", token);
     }
 }
