@@ -7,6 +7,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
+  const googleLogin = () => {
+    const base = import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
+    window.location.href = `${base}/oauth2/authorization/google`
+  }
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
     try {
@@ -45,6 +50,9 @@ export default function LoginPage() {
         </div>
         <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
           Login
+        </button>
+        <button type="button" onClick={googleLogin} className="w-full bg-red-600 text-white p-2 rounded">
+          Sign in with Google
         </button>
       </form>
     </div>
