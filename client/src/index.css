@@ -77,3 +77,66 @@ body {
     @apply bg-[var(--background)];
   }
 }
+
+@layer components {
+  .bg-background {
+    @apply bg-[hsl(var(--background))];
+  }
+  .text-foreground {
+    @apply text-[hsl(var(--foreground))];
+  }
+  .bg-card {
+    @apply bg-[hsl(var(--card))];
+  }
+  .text-card-foreground {
+    @apply text-[hsl(var(--card-foreground))];
+  }
+  .bg-popover {
+    @apply bg-[hsl(var(--popover))];
+  }
+  .text-popover-foreground {
+    @apply text-[hsl(var(--popover-foreground))];
+  }
+  .bg-primary {
+    @apply bg-[hsl(var(--primary))];
+  }
+  .text-primary-foreground {
+    @apply text-[hsl(var(--primary-foreground))];
+  }
+  .bg-secondary {
+    @apply bg-[hsl(var(--secondary))];
+  }
+  .text-secondary-foreground {
+    @apply text-[hsl(var(--secondary-foreground))];
+  }
+  .bg-muted {
+    @apply bg-[hsl(var(--muted))];
+  }
+  .text-muted-foreground {
+    @apply text-[hsl(var(--muted-foreground))];
+  }
+  .bg-accent {
+    @apply bg-[hsl(var(--accent))];
+  }
+  .text-accent-foreground {
+    @apply text-[hsl(var(--accent-foreground))];
+  }
+  .bg-destructive {
+    @apply bg-[hsl(var(--destructive))];
+  }
+  .text-destructive-foreground {
+    @apply text-[hsl(var(--destructive-foreground))];
+  }
+  .border-border {
+    @apply border-[hsl(var(--border))];
+  }
+  .bg-input {
+    @apply bg-[hsl(var(--input))];
+  }
+  .ring-ring {
+    --tw-ring-color: hsl(var(--ring));
+  }
+  .rounded-radius {
+    border-radius: var(--radius);
+  }
+}
