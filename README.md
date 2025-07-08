@@ -6,6 +6,7 @@ This repository hosts both the Spring Boot backend and the React frontend used t
 
 ### Features
 - User registration and authentication
+- Google login via OAuth2
 - Management of bank accounts, credit cards, expenses, and billing cycles
 - Bill payment tracking and spending summaries
 - Soft deletion with auditing timestamps
@@ -13,6 +14,7 @@ This repository hosts both the Spring Boot backend and the React frontend used t
 ### Getting Started
 1. Install **Java 21** and ensure `java -version` reports it.
 2. Copy `server/src/main/resources/application-template.properties` to `server/src/main/resources/application.properties` and edit the database credentials and JWT secret.
+   You will also need to provide Google OAuth2 client details and set `app.frontend-url` to your React app base URL.
 3. From the `server` directory run:
    ```bash
    ./mvnw spring-boot:run
