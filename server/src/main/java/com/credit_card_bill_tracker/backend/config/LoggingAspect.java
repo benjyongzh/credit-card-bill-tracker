@@ -17,7 +17,15 @@ public class LoggingAspect {
 
     @Before("execution(* com.credit_card_bill_tracker.backend..*Service.*(..))")
     public void logServiceMethodEntry(JoinPoint joinPoint) {
-        log.info("Entering {} with args {}", joinPoint.getSignature(), Arrays.toString(joinPoint.getArgs()));
+        Object[] args = joinPoint.getArgs();
+        // Mask sensitive arguments such as the password used in AuthService.login
+        if ("login".equals(joinPoint.getSignature().getName())
+                && joinPoint.getSignature().getDeclaringTypeName().endsWith("AuthService")
+                && args.length > 1) {
+            args = Arrays.copyOf(args, args.length);
+            args[1] = "***";
+        }
+        log.info("Entering {} with args {}", joinPoint.getSignature(), Arrays.toString(args));
     }
 
     @AfterReturning(pointcut = "execution(* com.credit_card_bill_tracker.backend..*Service.*(..))", returning = "result")

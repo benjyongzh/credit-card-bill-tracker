@@ -36,8 +36,9 @@ public class CreditCardService {
         return mapper.toResponseDto(repository.save(card));
     }
 
-    public void deleteCard(UUID id) {
+    public void deleteCard(User user, UUID id) {
         CreditCard card = repository.findById(id)
+                .filter(c -> c.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Credit card not found"));
         card.softDelete();
         repository.save(card);

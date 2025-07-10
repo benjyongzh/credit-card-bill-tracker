@@ -42,8 +42,9 @@ public class CreditCardController {
 
     @Operation(summary = "Delete credit card", description = "Removes the specified credit card")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteCard(@PathVariable UUID id) {
-        creditCardService.deleteCard(id);
+    public ResponseEntity<ApiResponse<Void>> deleteCard(@AuthenticationPrincipal User user,
+                                                        @PathVariable UUID id) {
+        creditCardService.deleteCard(user, id);
         return ApiResponseBuilder.noContent();
     }
 }
