@@ -21,13 +21,25 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private LoginAttemptService loginAttemptService;
+
     public String login(String username, String rawPassword) {
+        if (loginAttemptService.isBlocked(username)) {
+            throw new UnauthorizedException("Too many login attempts. Please try again later");
+        }
+
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UnauthorizedException("Invalid username or password"));
+                .orElseThrow(() -> {
+                    loginAttemptService.loginFailed(username);
+                    return new UnauthorizedException("Invalid username or password");
+                });
 
         if (!passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
+            loginAttemptService.loginFailed(username);
             throw new UnauthorizedException("Invalid username or password");
         }
+        loginAttemptService.loginSucceeded(username);
         String token = jwtUtil.generateToken(user.getUsername());
         log.info("User {} logged in", username);
         return token;

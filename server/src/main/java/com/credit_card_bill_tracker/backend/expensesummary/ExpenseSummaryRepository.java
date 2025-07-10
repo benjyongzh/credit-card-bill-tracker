@@ -19,6 +19,7 @@ public interface ExpenseSummaryRepository extends BaseRepository<ExpenseSummary,
       AND from_account_id = :fromAccountId
       AND to_id = :toId
       AND to_type = :toType
+      AND deleted_at IS NULL
     """, nativeQuery = true)
     Optional<ExpenseSummary> findExactNative(
             @Param("userId") UUID userId,
