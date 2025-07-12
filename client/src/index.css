@@ -218,6 +218,30 @@ body {
   .text-destructive-foreground {
     @apply text-[hsl(var(--destructive-foreground))];
   }
+  .bg-sidebar {
+    @apply bg-[hsl(var(--sidebar))];
+  }
+  .text-sidebar-foreground {
+    @apply text-[hsl(var(--sidebar-foreground))];
+  }
+  .bg-sidebar-primary {
+    @apply bg-[hsl(var(--sidebar-primary))];
+  }
+  .text-sidebar-primary-foreground {
+    @apply text-[hsl(var(--sidebar-primary-foreground))];
+  }
+  .bg-sidebar-accent {
+    @apply bg-[hsl(var(--sidebar-accent))];
+  }
+  .text-sidebar-accent-foreground {
+    @apply text-[hsl(var(--sidebar-accent-foreground))];
+  }
+  .border-sidebar-border {
+    @apply border-[hsl(var(--sidebar-border))];
+  }
+  .ring-sidebar-ring {
+    --tw-ring-color: hsl(var(--sidebar-ring));
+  }
   .border-border {
     @apply border-[hsl(var(--border))];
   }
