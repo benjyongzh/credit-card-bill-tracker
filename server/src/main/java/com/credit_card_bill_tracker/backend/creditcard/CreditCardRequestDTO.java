@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 @Data
-public class CreditCardDTO {
+public class CreditCardRequestDTO {
     @NotBlank
     @Size(max = 100)
     private String cardName;

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
-public class BillingCycleDTO {
+public class BillingCycleRequestDTO {
     @NotBlank
     @Size(max = 100)
     private String label;

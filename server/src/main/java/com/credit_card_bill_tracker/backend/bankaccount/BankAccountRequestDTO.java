@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 @Data
-public class BankAccountDTO {
+public class BankAccountRequestDTO {
     @NotBlank
     @Size(max = 100)
     private String name;

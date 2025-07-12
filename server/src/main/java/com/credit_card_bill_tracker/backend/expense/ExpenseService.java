@@ -9,6 +9,7 @@ import com.credit_card_bill_tracker.backend.expensesummary.ExpenseSummaryService
 import com.credit_card_bill_tracker.backend.spendingprofile.SpendingProfile;
 import com.credit_card_bill_tracker.backend.spendingprofile.SpendingProfileRepository;
 import com.credit_card_bill_tracker.backend.user.User;
+import com.credit_card_bill_tracker.backend.expense.ExpenseRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +53,7 @@ public class ExpenseService {
 //        return mapper.toDto(repository.save(entity));
 //    }
 
-    public ExpenseResponseDTO createWithSpendingProfile(User user, ExpenseCreateDTO dto, UUID spendingProfileId) {
+    public ExpenseResponseDTO createWithSpendingProfile(User user, ExpenseRequestDTO dto, UUID spendingProfileId) {
         Expense entity = new Expense();
         entity.setUser(user);
         entity.setCreditCard(creditCardRepo.findById(dto.getCreditCardId())
@@ -71,7 +72,7 @@ public class ExpenseService {
         return mapper.toResponseDto(saved);
     }
 
-    public ExpenseResponseDTO update(User user, UUID id, ExpenseDTO dto) {
+    public ExpenseResponseDTO update(User user, UUID id, ExpenseRequestDTO dto) {
         Expense entity = repository.findById(id)
                 .filter(e -> e.getUser().getId().equals(user.getId()))
                 .orElseThrow();

@@ -1,11 +1,13 @@
 package com.credit_card_bill_tracker.backend.billpayment;
 
 import com.credit_card_bill_tracker.backend.billingcycle.*;
+import com.credit_card_bill_tracker.backend.billpayment.BillPaymentRequestDTO;
 import com.credit_card_bill_tracker.backend.common.BaseEntity;
 import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
 import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.expensesummary.ExpenseSummaryService;
 import com.credit_card_bill_tracker.backend.user.User;
+import com.credit_card_bill_tracker.backend.billingcycle.BillingCycleRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +30,7 @@ public class BillPaymentService {
                 .toList();
     }
 
-    public BillPaymentResponseDTO create(User user, BillPaymentDTO dto) {
+    public BillPaymentResponseDTO create(User user, BillPaymentRequestDTO dto) {
         BillPayment entity = billPaymentMapper.fromDto(dto);
         entity.setUser(user);
         entity.setCompleted(false);
@@ -39,7 +41,7 @@ public class BillPaymentService {
         return billPaymentMapper.toResponseDto(saved);
     }
 
-    public BillPaymentResponseDTO update(User user, UUID id, BillPaymentDTO dto) {
+    public BillPaymentResponseDTO update(User user, UUID id, BillPaymentRequestDTO dto) {
         BillPayment existing = billPaymentRepository.findById(id)
                 .filter(p -> p.getUser().getId().equals(user.getId()))
                 .orElseThrow();
@@ -74,7 +76,7 @@ public class BillPaymentService {
             bp.setCompleted(true);
         }
         billPaymentRepository.saveAll(inProgress);
-        BillingCycleDTO cycle = new BillingCycleDTO();
+        BillingCycleRequestDTO cycle = new BillingCycleRequestDTO();
         cycle.setBillPaymentIds(inProgress.stream().map(BaseEntity::getId).toList());
         LocalDate now = LocalDate.now();
         cycle.setCompletedDate(now);

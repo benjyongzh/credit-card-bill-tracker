@@ -3,6 +3,7 @@ package com.credit_card_bill_tracker.backend.spendingprofile;
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccountRepository;
 import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.user.User;
+import com.credit_card_bill_tracker.backend.spendingprofile.SpendingProfileRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class SpendingProfileService {
                 .toList();
     }
 
-    public SpendingProfileResponseDTO create(User user, SpendingProfileDTO dto) {
+    public SpendingProfileResponseDTO create(User user, SpendingProfileRequestDTO dto) {
         SpendingProfile profile = mapper.fromDto(dto);
         profile.setUser(user);
         profile.setBankAccounts(dto.getBankAccountIds().stream()
@@ -34,7 +35,7 @@ public class SpendingProfileService {
         return mapper.toResponseDto(repository.save(profile));
     }
 
-    public SpendingProfileResponseDTO update(User user, UUID id, SpendingProfileDTO dto) {
+    public SpendingProfileResponseDTO update(User user, UUID id, SpendingProfileRequestDTO dto) {
         SpendingProfile entity = repository.findById(id)
                 .filter(p -> p.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Spending profile not found"));

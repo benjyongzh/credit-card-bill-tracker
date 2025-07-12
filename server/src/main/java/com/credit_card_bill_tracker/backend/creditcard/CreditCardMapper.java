@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CreditCardMapper {
 
-    public CreditCardDTO toDto(CreditCard entity) {
-        CreditCardDTO dto = new CreditCardDTO();
+    public CreditCardRequestDTO toDto(CreditCard entity) {
+        CreditCardRequestDTO dto = new CreditCardRequestDTO();
         dto.setCardName(entity.getCardName());
         dto.setLastFourDigits(entity.getLastFourDigits());
         return dto;
@@ -21,14 +21,14 @@ public class CreditCardMapper {
         return dto;
     }
 
-    public CreditCard fromDto(CreditCardDTO dto) {
+    public CreditCard fromDto(CreditCardRequestDTO dto) {
         CreditCard entity = new CreditCard();
         entity.setCardName(dto.getCardName());
         entity.setLastFourDigits(dto.getLastFourDigits());
         return entity;
     }
 
-    public void updateEntityFromDto(CreditCard entity, CreditCardDTO dto) {
+    public void updateEntityFromDto(CreditCard entity, CreditCardRequestDTO dto) {
         entity.setCardName(dto.getCardName());
         entity.setLastFourDigits(dto.getLastFourDigits());
     }
