@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class BankAccountMapper {
 
-    public BankAccountDTO toDto(BankAccount entity) {
-        BankAccountDTO dto = new BankAccountDTO();
+    public BankAccountRequestDTO toDto(BankAccount entity) {
+        BankAccountRequestDTO dto = new BankAccountRequestDTO();
         dto.setName(entity.getName());
         dto.setDefault(entity.isDefault());
         dto.setDefaultCardId(entity.getDefaultCard() != null ? entity.getDefaultCard().getId() : null);
@@ -23,7 +23,7 @@ public class BankAccountMapper {
         return dto;
     }
 
-    public BankAccount fromDto(BankAccountDTO dto) {
+    public BankAccount fromDto(BankAccountRequestDTO dto) {
         BankAccount entity = new BankAccount();
         entity.setName(dto.getName());
         entity.setIsDefault(dto.isDefault());
@@ -31,7 +31,7 @@ public class BankAccountMapper {
         return entity;
     }
 
-    public void updateEntityFromDto(BankAccount entity, BankAccountDTO dto) {
+    public void updateEntityFromDto(BankAccount entity, BankAccountRequestDTO dto) {
         entity.setName(dto.getName());
         entity.setIsDefault(dto.isDefault());
         // Note: defaultCard should be updated in the service via repo lookup.

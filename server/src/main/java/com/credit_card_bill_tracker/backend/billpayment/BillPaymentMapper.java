@@ -2,6 +2,7 @@ package com.credit_card_bill_tracker.backend.billpayment;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccountRepository;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCardRepository;
+import com.credit_card_bill_tracker.backend.billpayment.BillPaymentRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +13,8 @@ public class BillPaymentMapper {
     private final CreditCardRepository creditCardRepository;
     private final BankAccountRepository bankAccountRepository;
 
-    public BillPaymentDTO toDto(BillPayment entity) {
-        BillPaymentDTO dto = new BillPaymentDTO();
+    public BillPaymentRequestDTO toDto(BillPayment entity) {
+        BillPaymentRequestDTO dto = new BillPaymentRequestDTO();
         dto.setAmount(entity.getAmount());
         dto.setDate(entity.getDate());
         dto.setCompleted(entity.isCompleted());
@@ -35,7 +36,7 @@ public class BillPaymentMapper {
         return dto;
     }
 
-    public BillPayment fromDto(BillPaymentDTO dto) {
+    public BillPayment fromDto(BillPaymentRequestDTO dto) {
         BillPayment entity = new BillPayment();
         entity.setAmount(dto.getAmount());
         entity.setDate(dto.getDate());
@@ -46,7 +47,7 @@ public class BillPaymentMapper {
         return entity;
     }
 
-    public void updateEntityFromDto(BillPayment entity, BillPaymentDTO dto) {
+    public void updateEntityFromDto(BillPayment entity, BillPaymentRequestDTO dto) {
         entity.setAmount(dto.getAmount());
         entity.setDate(dto.getDate());
         entity.setFromAccount(bankAccountRepository.getReferenceById(dto.getFromAccountId()));

@@ -4,6 +4,7 @@ import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundExcept
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCardRepository;
 import com.credit_card_bill_tracker.backend.user.User;
+import com.credit_card_bill_tracker.backend.bankaccount.BankAccountRequestDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class BankAccountService {
     }
 
     @Transactional
-    public BankAccountResponseDTO create(User user, BankAccountDTO dto) {
+    public BankAccountResponseDTO create(User user, BankAccountRequestDTO dto) {
         BankAccount account = mapper.fromDto(dto);
         account.setUser(user);
 
@@ -50,7 +51,7 @@ public class BankAccountService {
         }
     }
 
-    public BankAccountResponseDTO update(User user, UUID id, BankAccountDTO dto) {
+    public BankAccountResponseDTO update(User user, UUID id, BankAccountRequestDTO dto) {
         BankAccount account = bankAccountRepo.findById(id)
                 .filter(a -> a.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Bank account not found"));

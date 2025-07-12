@@ -4,6 +4,7 @@ import com.credit_card_bill_tracker.backend.billingcycle.BillingCycleResponseDTO
 import com.credit_card_bill_tracker.backend.common.ApiResponse;
 import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
 import com.credit_card_bill_tracker.backend.user.User;
+import com.credit_card_bill_tracker.backend.billpayment.BillPaymentRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +30,14 @@ public class BillPaymentController {
 
     @Operation(summary = "Create bill payment", description = "Registers a new payment for a bill")
     @PostMapping
-    public ResponseEntity<ApiResponse<BillPaymentResponseDTO>> create(@AuthenticationPrincipal User user, @RequestBody BillPaymentDTO dto) {
+    public ResponseEntity<ApiResponse<BillPaymentResponseDTO>> create(@AuthenticationPrincipal User user, @RequestBody BillPaymentRequestDTO dto) {
         BillPaymentResponseDTO result = service.create(user, dto);
         return ApiResponseBuilder.created(result);
     }
 
     @Operation(summary = "Update bill payment", description = "Updates a registered bill payment")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<BillPaymentResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BillPaymentDTO dto) {
+    public ResponseEntity<ApiResponse<BillPaymentResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BillPaymentRequestDTO dto) {
         BillPaymentResponseDTO result = service.update(user, id, dto);
         return ApiResponseBuilder.accepted(result);
     }

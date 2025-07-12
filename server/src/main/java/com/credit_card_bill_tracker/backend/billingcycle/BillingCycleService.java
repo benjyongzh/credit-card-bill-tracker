@@ -6,6 +6,7 @@ import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.user.User;
+import com.credit_card_bill_tracker.backend.billingcycle.BillingCycleRequestDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class BillingCycleService {
     }
 
     @Transactional
-    public BillingCycleResponseDTO create(User user, BillingCycleDTO dto) {
+    public BillingCycleResponseDTO create(User user, BillingCycleRequestDTO dto) {
         BillingCycle entity = billingCycleMapper.toEntity(dto, user);
         BillingCycle savedCycle = repository.save(entity);
 
@@ -74,7 +75,7 @@ public class BillingCycleService {
     }
 
     @Transactional
-    public BillingCycleResponseDTO update(User user, UUID id, BillingCycleDTO dto) {
+    public BillingCycleResponseDTO update(User user, UUID id, BillingCycleRequestDTO dto) {
         BillingCycle cycle = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Billing cycle not found"));

@@ -1,15 +1,17 @@
 package com.credit_card_bill_tracker.backend.expense;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
+import com.credit_card_bill_tracker.backend.expense.ExpenseRequestDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
+import java.util.List;
 
 @Component
 public class ExpenseMapper {
 
-    public ExpenseDTO toDto(Expense entity) {
-        ExpenseDTO dto = new ExpenseDTO();
+    public ExpenseRequestDTO toDto(Expense entity) {
+        ExpenseRequestDTO dto = new ExpenseRequestDTO();
         dto.setDate(entity.getDate());
         dto.setAmount(entity.getAmount());
         dto.setDescription(entity.getDescription());
@@ -34,7 +36,7 @@ public class ExpenseMapper {
         return dto;
     }
 
-    public Expense fromDto(ExpenseDTO dto) {
+    public Expense fromDto(ExpenseRequestDTO dto) {
         Expense entity = new Expense();
         entity.setDate(dto.getDate());
         entity.setAmount(dto.getAmount());
@@ -42,7 +44,7 @@ public class ExpenseMapper {
         return entity;
     }
 
-    public void updateEntityFromDto(Expense entity, ExpenseDTO dto) {
+    public void updateEntityFromDto(Expense entity, ExpenseRequestDTO dto) {
         entity.setDate(dto.getDate());
         entity.setAmount(dto.getAmount());
         entity.setDescription(dto.getDescription());

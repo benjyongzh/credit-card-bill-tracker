@@ -3,6 +3,7 @@ package com.credit_card_bill_tracker.backend.spendingprofile;
 import com.credit_card_bill_tracker.backend.common.ApiResponse;
 import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
 import com.credit_card_bill_tracker.backend.user.User;
+import com.credit_card_bill_tracker.backend.spendingprofile.SpendingProfileRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +29,14 @@ public class SpendingProfileController {
 
     @Operation(summary = "Create spending profile", description = "Creates a new spending profile")
     @PostMapping
-    public ResponseEntity<ApiResponse<SpendingProfileResponseDTO>> create(@AuthenticationPrincipal User user, @RequestBody SpendingProfileDTO dto) {
+    public ResponseEntity<ApiResponse<SpendingProfileResponseDTO>> create(@AuthenticationPrincipal User user, @RequestBody SpendingProfileRequestDTO dto) {
         SpendingProfileResponseDTO result = service.create(user, dto);
         return ApiResponseBuilder.created(result);
     }
 
     @Operation(summary = "Update spending profile", description = "Updates the specified spending profile")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<SpendingProfileResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody SpendingProfileDTO dto) {
+    public ResponseEntity<ApiResponse<SpendingProfileResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody SpendingProfileRequestDTO dto) {
         SpendingProfileResponseDTO result = service.update(user, id, dto);
         return ApiResponseBuilder.accepted(result);
     }
