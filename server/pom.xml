@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.credit-card-bill-tracker</groupId>
-	<artifactId>backend</artifactId>
+	<artifactId>credit-card-bill-tracker-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>backend</name>
 	<description>backend for credit card bill tracker project</description>
