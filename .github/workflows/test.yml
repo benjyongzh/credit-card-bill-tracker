@@ -14,6 +14,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+
 jobs:
   backend-tests:
     name: Build and Test Spring Boot
@@ -36,7 +41,7 @@ jobs:
           echo "artifactId=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> "$GITHUB_OUTPUT"
           echo "groupId=$(mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)" >> "$GITHUB_OUTPUT"
       - name: Build Spring Boot app
-        run: mvn clean package
+        run: mvn clean package -Dspring.profiles.active=ci
       - name: Rename JAR file
         run: mv target/*.jar target/${{ steps.get_meta.outputs.artifactId }}-${{ steps.get_meta.outputs.version }}.jar
       - name: Upload renamed JAR
