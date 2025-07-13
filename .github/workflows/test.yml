@@ -53,6 +53,7 @@ jobs:
         run: |
           ./mvnw liquibase:validate \
             -Dspring.profiles.active=ci \
+            -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml \
             -Dliquibase.url=jdbc:postgresql://localhost:5432/testdb \
             -Dliquibase.username=liquibase \
             -Dliquibase.password=liquibase \
@@ -63,6 +64,7 @@ jobs:
           FILE_NAME="changelog-preview-${TIMESTAMP}.sql"
           ./mvnw liquibase:updateSQL \
             -Dspring.profiles.active=ci \
+            -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml \
             -Dliquibase.url=jdbc:postgresql://localhost:5432/testdb \
             -Dliquibase.username=liquibase \
             -Dliquibase.password=liquibase \
