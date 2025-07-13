@@ -1,0 +1,76 @@
+#!/bin/bash
+set -e
+
+REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+cd "$REPO_ROOT"
+
+echo "🔍 Checking for modified @Entity classes..."
+
+# 1. Get all staged .java files
+STAGED_JAVA_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.java$' || true)
+
+ENTITY_CHANGED=false
+MODIFIED_ENTITIES=()
+
+for file in $STAGED_JAVA_FILES; do
+  if grep -q "@Entity" "$file"; then
+    ENTITY_CHANGED=true
+    MODIFIED_ENTITIES+=("$file")
+  fi
+done
+
+# 2. If entity changed, check for staged changelog
+if [ "$ENTITY_CHANGED" = true ]; then
+  echo "⚠️  Entity class(es) modified:"
+  for entity_file in "${MODIFIED_ENTITIES[@]}"; do
+    echo "   - $entity_file"
+  done
+
+  STAGED_CHANGELOG_FILES=$(git diff --cached --name-only | grep -E 'server/src/main/resources/db/changelog/(records/.*\.xml|db\.changelog-master\.xml)' || true)
+
+  if [ -z "$STAGED_CHANGELOG_FILES" ]; then
+    # Check if files exist but are not staged
+    UNSTAGED_CHANGELOGS=$(git ls-files --others --exclude-standard server/src/main/resources/db/changelog/records/*.xml || true)
+
+    if [ -n "$UNSTAGED_CHANGELOGS" ]; then
+      echo "⚠️  Found changelog files you created but didn't stage:"
+      echo "$UNSTAGED_CHANGELOGS"
+      read -rp "Do you want to stage them now? (y/n): " STAGE_NOW
+      if [[ "$STAGE_NOW" =~ ^[Yy]$ ]]; then
+        git add $UNSTAGED_CHANGELOGS
+        git add server/src/main/resources/db/changelog/db.changelog-master.xml
+        echo "✅ Changelog files staged. Please re-run your commit."
+        exit 1
+      else
+        echo "❌ Commit blocked. Please stage your changelog files manually."
+        exit 1
+      fi
+    fi
+
+    echo "❌ No changelog files are staged!"
+    echo "➡️  You probably forgot to run or stage ./server/scripts/generate-liquibase-changelog.sh"
+
+    read -rp "Run changelog generator now? (y/n): " ANSWER
+    if [[ "$ANSWER" =~ ^[Yy]$ ]]; then
+      echo "🚀 Running changelog generator..."
+      bash ./server/scripts/generate-liquibase-changelog.sh
+
+      echo "🔄 Re-staging changelog files..."
+      git add server/src/main/resources/db/changelog/records/*.xml
+      git add server/src/main/resources/db/changelog/db.changelog-master.xml
+
+      echo "✅ Changelog generated and staged."
+      echo "📝 Please re-run your commit manually."
+      exit 1
+    else
+      echo "❌ Commit blocked due to missing changelog."
+      exit 1
+    fi
+  else
+    echo "✅ Changelog file(s) detected and staged:"
+    echo "$STAGED_CHANGELOG_FILES"
+  fi
+fi
+
+echo "✅ Pre-commit check passed."
+exit 0

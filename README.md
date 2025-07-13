@@ -2,77 +2,178 @@
 
 This repository hosts both the Spring Boot backend and the React frontend used to manage credit card finances. The backend exposes REST APIs secured with JWT and persists data in PostgreSQL, while the frontend is a Vite-powered single page application written in TypeScript.
 
-## Backend
+---
 
-### Features
-- User registration and authentication
-- Google login via OAuth2
+## Backend (`/server`)
+
+### 🔧 Features
+
+- User registration and authentication (JWT + Google OAuth2)
 - Management of bank accounts, credit cards, expenses, and billing cycles
-- Bill payment tracking and spending summaries
+- Bill payment tracking and automated bill summary suggestions
 - Soft deletion with auditing timestamps
+- Liquibase-managed database schema with versioned changelogs
 
-### Getting Started
-1. Install **Java 21** and ensure `java -version` reports it.
-2. Copy `server/src/main/resources/application-template.properties` to `server/src/main/resources/application.properties` and edit the database credentials and JWT secret.
-   You will also need to provide Google OAuth2 client details and set `app.frontend-url` to your React app base URL.
-3. From the `server` directory run:
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-   The server starts on `localhost:9000` by default.
+---
 
-### Running Tests
-Execute the tests with:
+### 🚀 Getting Started
+
+#### Prerequisites
+
+- **Java 21**
+- **PostgreSQL**
+
+#### 1. Clone and Setup Dev Environment
+
+```bash
+bash server/scripts/setup-dev.sh
+```
+
+This script will:
+
+- Link the Git pre-commit hook
+- Ensure it is executable
+- Create a `.env` file in `/server` (if missing) with placeholders for DB credentials
+
+> 📂 The `.env` file is used for Liquibase CLI scripts. It should not be committed.
+
+#### 2. Configure Spring Boot
+
+Configure your application-local.properties. You can first copy the contents from:
+
+```bash
+server/src/main/resources/application-template.properties
+```
+
+Edit the file to match your environment:
+
+- `spring.datasource.*`: PostgreSQL URL, user, password
+- `jwt.secret`: your JWT signing key
+- `spring.security.oauth2.client.registration.google.*`: your Google client credentials
+- `app.frontend-url`: the React frontend base URL
+
+---
+
+### 🧬 Liquibase (Database Migrations)
+
+- Liquibase is used to manage schema changes via versioned changelog files.
+- Changesets are committed to `server/src/main/resources/db/changelog/records/`.
+- The master changelog is at `db.changelog-master.xml`.
+
+#### Generating a Changelog
+
+After modifying any `@Entity`, generate a changelog:
+
+```bash
+bash server/scripts/generate-liquibase-changelog.sh
+```
+
+This script will:
+
+- Use your `.env` credentials to connect to the DB
+- Compare your JPA model to the DB
+- Generate a versioned changelog in `db/changelog/records/`
+- Automatically append it to `db.changelog-master.xml`
+
+#### Git Hook Automation
+
+- A pre-commit Git hook detects when you change an entity and prompts:
+
+  - ❓ "Run changelog generator? (y/n)"
+  - ✅ If yes, it runs the script and re-stages the changelog
+  - ❌ If no, it blocks the commit
+
+---
+
+### 🔧 Running the App Locally
+
+From the `/server` directory:
+
+```bash
+./mvnw spring-boot:run
+```
+
+or if you already have Maven in your machine:
+
+```bash
+mvn spring-boot:run
+```
+
+The backend starts on `http://localhost:9000`.
+
+---
+
+### 🧪 Running Tests
+
 ```bash
 ./mvnw test
 ```
 
-### Packaging and Deployment
-Build an executable jar via:
+---
+
+### 📦 Packaging for Deployment
+
 ```bash
 ./mvnw clean package
-```
-Run it with:
-```bash
 java -jar target/backend-0.0.1-SNAPSHOT.jar
 ```
-Configure your production environment using the same property keys as in `application-template.properties`.
 
-### Repository Layout
-Source code lives under `server/` following a domain-driven structure (e.g., `auth`, `bankaccount`, `creditcard`). A zipped copy of the backend (`backend.zip`) is included for reference.
+Use the same property keys as in `application-template.properties` for production configs.
 
-### Module Breakdown
-- **auth**: login endpoints, JWT handling, and security config
-- **bankaccount**: CRUD operations for user bank accounts
-- **billingcycle**: manages billing cycles and generates deferred bills
-- **billpayment**: processes bill payments and provides optimization suggestions
-- **creditcard**: tracks user credit cards and their limits
-- **expense**: handles spending records and categorization
-- **expensesummary**: aggregates expenses by account or card
-- **spendingprofile**: stores spending goals and profiles
-- **user**: user management and registration
-- **common**: shared base entities, API responses, and soft deletion helpers
-- **config**: JPA configuration and repository setup
+---
 
-## Frontend
-The `client` directory contains the React SPA.
+### 📁 Repository Structure
 
-### Development
-1. Copy `client/.env.example` to `client/.env` and adjust `VITE_API_BASE_URL` if the backend is hosted elsewhere.
-2. Install dependencies:
-   ```bash
-   cd client
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-   The app will run on `http://localhost:5173` by default.
+```
+/server
+├── setup-dev.sh             # One-time setup: links hook, creates .env
+├── scripts/
+│   └── hooks/pre-commit     # Detects @Entity changes and prompts changelog
+├── generate-liquibase-changelog.sh    # Liquibase changelog generator
+├── .env                     # Local-only: DB_URL, DB_USER, DB_PASS
+├── src/main/resources/db/changelog/
+│   ├── db.changelog-master.xml
+│   └── records/             # Auto-generated changelogs
+└── src/main/java/com/...    # Domain-driven modules
+```
 
-### Building for production
-Run the build command in the `client` directory:
+---
+
+## Frontend (`/client`)
+
+### 💻 Development
+
+1. Copy and configure environment variables:
+
+```bash
+cp client/.env.example client/.env
+```
+
+2. Install and start:
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Runs by default on `http://localhost:5173`.
+
+---
+
+### 🏗️ Production Build
+
 ```bash
 npm run build
 ```
-The static files will be generated under `client/dist`.
+
+Output will be in `client/dist`.
+
+---
+
+## 🧠 Tips
+
+- All backend schema changes **must go through Liquibase** (`generate-liquibase-changelog.sh`)
+- **Never** edit already-applied changelogs
+- Commit the generated changelog XML files and updated master changelog XML file
+- Use `setup-dev.sh` after cloning to get up and running fast
