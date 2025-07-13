@@ -52,7 +52,11 @@ jobs:
       - name: Run Liquibase validation
         run: |
           ./mvnw liquibase:validate \
-            -Dspring.profiles.active=ci
+            -Dspring.profiles.active=ci \
+            -Dliquibase.url=jdbc:postgresql://localhost:5432/testdb \
+            -Dliquibase.username=liquibase \
+            -Dliquibase.password=liquibase \
+            -Dliquibase.driver=org.postgresql.Driver
       - name: Generate timestamped SQL file from changelogs
         run: |
           TIMESTAMP=$(date +%s)
