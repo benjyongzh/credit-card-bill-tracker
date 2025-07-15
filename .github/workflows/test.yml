@@ -20,9 +20,34 @@ env:
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      client: ${{ steps.filter.outputs.client }}
+      server: ${{ steps.filter.outputs.server }}
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check which areas changed
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            client:
+              - 'client/**'
+            server:
+              - 'server/**'
+            infra:
+              - '.git/**'
+              - '.github/**'
+              - '*.md'
+              - '*.sh'
+              - '*.env'
+              - '*.gitignore'
   liquibase-validate:
     name: Validate Liquibase Changelogs + Generate SQL
     runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.server == 'true'
     needs: backend-tests
     services:
       postgres:
@@ -79,6 +104,8 @@ jobs:
 
   backend-tests:
     name: Build and Test Spring Boot
+    if: needs.detect-changes.outputs.server == 'true'
+    needs: detect-changes
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -106,6 +133,8 @@ jobs:
           path: server/target/${{ steps.get_meta.outputs.artifactId }}-${{ steps.get_meta.outputs.version }}.jar
   frontend-build:
     name: Build React frontend
+    if: needs.detect-changes.outputs.client == 'true'
+    needs: detect-changes
     runs-on: ubuntu-latest
     defaults:
       run:
