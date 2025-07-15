@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage'
 import CreditCardsPage from './pages/CreditCardsPage'
 import BankAccountsPage from './pages/BankAccountsPage'
 import SpendingProfilesPage from './pages/SpendingProfilesPage'
+import NotFoundPage from './pages/NotFoundPage'
 import { useAuthStore } from './store/auth'
 
 function Dashboard() {
@@ -25,7 +26,8 @@ export default function App() {
               <Route path="/credit-cards" element={<CreditCardsPage />} />
               <Route path="/bank-accounts" element={<BankAccountsPage />} />
               <Route path="/spending-profiles" element={<SpendingProfilesPage />} />
-              <Route path="*" element={<Navigate to="/dashboard" />} />
+              <Route path="/404" element={<NotFoundPage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </AppLayout>
         ) : (
