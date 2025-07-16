@@ -2,7 +2,7 @@ package com.credit_card_bill_tracker.backend.expensesummary;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.billpayment.BillPayment;
-import com.credit_card_bill_tracker.backend.common.errors.UnauthorizedException;
+import com.credit_card_bill_tracker.backend.common.errors.ForbiddenException;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.expense.Expense;
 import com.credit_card_bill_tracker.backend.user.User;
@@ -25,7 +25,7 @@ public class ExpenseSummaryService {
 
     public List<ExpenseSummaryResponseDTO> getAllSummaries(User user, UUID userId) {
         if (!user.getId().equals(userId))
-            throw new UnauthorizedException("User does not have permission to view other user's summaries.");
+            throw new ForbiddenException("User does not have permission to view other user's summaries.");
 
         return summaryRepository.findByUserId(userId).stream()
                 .map(mapper::toResponseDto)

@@ -75,14 +75,16 @@ public class ExpenseService {
     public ExpenseResponseDTO update(User user, UUID id, ExpenseRequestDTO dto) {
         Expense entity = repository.findById(id)
                 .filter(e -> e.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
 
         summaryService.updateFromExpense(user, entity, false); // reverse old
 
         mapper.updateEntityFromDto(entity, dto);
-        entity.setCreditCard(creditCardRepo.findById(dto.getCreditCardId()).orElseThrow());
+        entity.setCreditCard(creditCardRepo.findById(dto.getCreditCardId())
+                .orElseThrow(() -> new ResourceNotFoundException("Credit card not found")));
         List<BankAccount> accounts = dto.getBankAccountIds().stream()
-                .map(aid -> bankAccountRepo.findById(aid).orElseThrow())
+                .map(aid -> bankAccountRepo.findById(aid)
+                        .orElseThrow(() -> new ResourceNotFoundException("Bank account not found")))
                 .toList();
         entity.setBankAccounts(new ArrayList<>(accounts));
 

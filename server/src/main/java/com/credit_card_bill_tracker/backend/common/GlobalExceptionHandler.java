@@ -4,6 +4,8 @@ import com.credit_card_bill_tracker.backend.common.errors.AppException;
 import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
 import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.common.errors.UnauthorizedException;
+import com.credit_card_bill_tracker.backend.common.errors.ConflictException;
+import com.credit_card_bill_tracker.backend.common.errors.ForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -48,6 +50,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiError> handleForbidden(ForbiddenException ex) {
+        ApiError error = new ApiError(
+                HttpStatus.FORBIDDEN.value(),
+                "Forbidden",
+                ex.getMessage(),
+                ex.getDetails()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiError> handleConflict(ConflictException ex) {
+        ApiError error = new ApiError(
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ex.getMessage(),
+                ex.getDetails()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ApiError> handleAppException(AppException ex) {
         ApiError error = new ApiError(
@@ -79,7 +103,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Runtime Error",
-                ex.getMessage()
+                "An unexpected server error occurred."
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
@@ -89,7 +113,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
-                ex.getMessage()
+                "An unexpected server error occurred."
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
