@@ -5,6 +5,7 @@ import com.credit_card_bill_tracker.backend.common.ApiResponse;
 import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
 import com.credit_card_bill_tracker.backend.user.User;
 import com.credit_card_bill_tracker.backend.billingcycle.BillingCycleRequestDTO;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class BillingCycleController {
     @Operation(summary = "Create billing cycle", description = "Creates a new billing cycle for the user")
     @PostMapping
     public ResponseEntity<ApiResponse<BillingCycleResponseDTO>> create(@AuthenticationPrincipal User user,
-                                          @RequestBody BillingCycleRequestDTO dto) {
+                                          @Valid @RequestBody BillingCycleRequestDTO dto) {
         BillingCycleResponseDTO result = service.create(user, dto);
         return ApiResponseBuilder.created(result);
     }
@@ -48,7 +49,7 @@ public class BillingCycleController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<BillingCycleResponseDTO>> update(@AuthenticationPrincipal User user,
                                           @PathVariable UUID id,
-                                          @RequestBody BillingCycleRequestDTO dto) {
+                                          @Valid @RequestBody BillingCycleRequestDTO dto) {
         BillingCycleResponseDTO result = service.update(user, id, dto);
         return ApiResponseBuilder.accepted(result);
     }

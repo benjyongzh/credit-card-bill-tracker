@@ -3,6 +3,8 @@ package com.credit_card_bill_tracker.backend.user;
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccountRepository;
 import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
+import com.credit_card_bill_tracker.backend.common.errors.ConflictException;
+import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCardRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +25,10 @@ public class UserService {
 
     public User register(UserDTO dto) {
         if (userRepository.existsByUsername(dto.getUsername())) {
-            throw new BadRequestException("Username already exists");
+            throw new ConflictException("Username already exists");
         }
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new BadRequestException("Email already exists");
+            throw new ConflictException("Email already exists");
         }
 
         User user = new User();
@@ -59,6 +61,7 @@ public class UserService {
     }
 
     public User getById(UUID id) {
-        return userRepository.findById(id).orElseThrow();
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 }

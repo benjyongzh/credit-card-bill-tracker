@@ -4,6 +4,7 @@ import com.credit_card_bill_tracker.backend.common.ApiResponse;
 import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
 import com.credit_card_bill_tracker.backend.user.User;
 import com.credit_card_bill_tracker.backend.expense.ExpenseRequestDTO;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class ExpenseController {
     public ResponseEntity<ApiResponse<ExpenseResponseDTO>> createExpenseWithProfile(
             @AuthenticationPrincipal User user,
             @RequestParam UUID spendingProfileId,
-            @RequestBody ExpenseRequestDTO dto
+            @Valid @RequestBody ExpenseRequestDTO dto
     ) {
         ExpenseResponseDTO result = service.createWithSpendingProfile(user, dto, spendingProfileId);
         return ApiResponseBuilder.created(result);
@@ -47,7 +48,7 @@ public class ExpenseController {
 
     @Operation(summary = "Update expense", description = "Modifies an existing expense")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ExpenseResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody ExpenseRequestDTO dto) {
+    public ResponseEntity<ApiResponse<ExpenseResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @Valid @RequestBody ExpenseRequestDTO dto) {
         ExpenseResponseDTO result = service.update(user, id, dto);
         return ApiResponseBuilder.accepted(result);
     }

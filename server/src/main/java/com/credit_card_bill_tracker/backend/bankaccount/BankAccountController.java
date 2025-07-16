@@ -4,6 +4,7 @@ import com.credit_card_bill_tracker.backend.common.ApiResponse;
 import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
 import com.credit_card_bill_tracker.backend.user.User;
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccountRequestDTO;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +30,14 @@ public class BankAccountController {
 
     @Operation(summary = "Create BankAccount", description = "Adds a new bank account for the authenticated user")
     @PostMapping
-    public ResponseEntity<ApiResponse<BankAccountResponseDTO>> create(@AuthenticationPrincipal User user, @RequestBody BankAccountRequestDTO dto) {
+    public ResponseEntity<ApiResponse<BankAccountResponseDTO>> create(@AuthenticationPrincipal User user, @Valid @RequestBody BankAccountRequestDTO dto) {
         BankAccountResponseDTO result = service.create(user, dto);
         return ApiResponseBuilder.created(result);
     }
 
     @Operation(summary = "Update BankAccount", description = "Modifies an existing bank account identified by id")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<BankAccountResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @RequestBody BankAccountRequestDTO dto) {
+    public ResponseEntity<ApiResponse<BankAccountResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @Valid @RequestBody BankAccountRequestDTO dto) {
         BankAccountResponseDTO result = service.update(user, id, dto);
         return ApiResponseBuilder.accepted(result);
     }

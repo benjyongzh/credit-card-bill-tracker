@@ -44,7 +44,7 @@ public class BillPaymentService {
     public BillPaymentResponseDTO update(User user, UUID id, BillPaymentRequestDTO dto) {
         BillPayment existing = billPaymentRepository.findById(id)
                 .filter(p -> p.getUser().getId().equals(user.getId()))
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Bill payment not found"));
 
         summaryService.updateFromBillPayment(user, existing, false); // reverse old
 
