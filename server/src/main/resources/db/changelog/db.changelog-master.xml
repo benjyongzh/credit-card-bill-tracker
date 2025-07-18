@@ -6,5 +6,8 @@
        http://www.liquibase.org/xml/ns/dbchangelog
        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.15.xsd">
 
+    <!-- Include the init changelog -->
+    <include file="db/changelog/db.changelog-init.xml"/>
+
     <!-- Future changelogs will be included here -->
 </databaseChangeLog>
