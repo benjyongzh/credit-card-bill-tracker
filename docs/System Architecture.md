@@ -1,4 +1,4 @@
-# Credit Card Bill Tracker - Architecture & Handover
+# Credit Card Bill Tracker - System Architecture
 
 ## 1. Project Overview
 This project manages personal credit card finances. It contains:
