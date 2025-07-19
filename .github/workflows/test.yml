@@ -74,6 +74,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+      - name: Compile resources for Liquibase
+        run: ./mvnw resources:resources
       - name: Run Liquibase validation
         run: |
           ./mvnw liquibase:validate \
