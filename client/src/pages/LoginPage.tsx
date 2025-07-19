@@ -12,6 +12,8 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form";
+import Modal from "@/components/Modal.tsx";
+import * as test from "node:test";
 
 const formSchema = z.object({
   username: z.string()
@@ -100,6 +102,19 @@ export default function LoginPage() {
                 Sign in with Google
             </Button>
             <Button variant="link" onClick={onRegister} className="text-primary-foreground underline cursor-pointer -mt-1 pt-0">Dont have an account? Register</Button>
+            <Modal title="testModal" triggerLabel="test here" triggerClassName="text-primary-foreground underline cursor-pointer -mt-1 pt-0" contentClassName="text-primary-foreground" onOpen={() => console.log("test modal is open")} >
+                <div>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                        Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.
+                        Donec eu libero sit amet quam egestas semper.
+                        Aenean ultricies mi vitae est. Mauris placerat eleifend leo.
+                        Quisque sit amet est et sapien ullamcorper pharetra.
+                        Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi.
+                    </p>
+                </div>
+            </Modal>
         </div>
     </div>
   )
