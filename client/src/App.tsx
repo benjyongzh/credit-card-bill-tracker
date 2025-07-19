@@ -15,7 +15,7 @@ export default function App() {
   const loggedIn = useAuthStore((s) => s.loggedIn)
 
   return (
-      <div className="relative min-h-screen">
+      <div className="relative min-h-screen min-w-screen">
           <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route

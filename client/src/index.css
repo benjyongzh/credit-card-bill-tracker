@@ -18,7 +18,7 @@
   --muted-foreground: rgb(58, 91, 160);
   --accent: rgb(110, 163, 193);
   --accent-foreground: rgb(255, 251, 230);
-  --destructive: rgb(45, 30, 47);
+  --destructive: rgb(160, 74, 108);
   --destructive-foreground: rgb(255, 251, 230);
   --border: rgb(176, 184, 193);
   --input: rgb(110, 163, 193);
@@ -27,7 +27,7 @@
   --chart-2: rgb(247, 200, 115);
   --chart-3: rgb(110, 163, 193);
   --chart-4: rgb(176, 184, 193);
-  --chart-5: rgb(45, 30, 47);
+  --chart-5: rgb(160, 74, 108);
   --sidebar: rgb(227, 234, 242);
   --sidebar-foreground: rgb(26, 34, 56);
   --sidebar-primary: rgb(58, 91, 160);
@@ -39,7 +39,7 @@
   --font-sans: Geist Mono, monospace;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --radius: 0.25rem;
+  --radius: 0.5rem;
   --shadow-2xs: 0 1px 12px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 12px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm: 0 1px 12px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
@@ -88,7 +88,7 @@
   --font-sans: Geist Mono, monospace;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --radius: 0.25rem;
+  --radius: 0.5rem;
   --shadow-2xs: 0 1px 12px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 12px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm: 0 1px 12px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
@@ -191,11 +191,17 @@ body {
   .bg-primary {
     @apply bg-[hsl(var(--primary))];
   }
+  .text-primary {
+    @apply text-[hsl(var(--primary))];
+  }
   .text-primary-foreground {
     @apply text-[hsl(var(--primary-foreground))];
   }
   .bg-secondary {
     @apply bg-[hsl(var(--secondary))];
+  }
+  .text-secondary {
+    @apply text-[hsl(var(--secondary))];
   }
   .text-secondary-foreground {
     @apply text-[hsl(var(--secondary-foreground))];
@@ -209,11 +215,17 @@ body {
   .bg-accent {
     @apply bg-[hsl(var(--accent))];
   }
+  .text-accent {
+    @apply text-[hsl(var(--accent))];
+  }
   .text-accent-foreground {
     @apply text-[hsl(var(--accent-foreground))];
   }
   .bg-destructive {
     @apply bg-[hsl(var(--destructive))];
+  }
+  .text-destructive {
+    @apply text-[hsl(var(--destructive))];
   }
   .text-destructive-foreground {
     @apply text-[hsl(var(--destructive-foreground))];
@@ -254,4 +266,8 @@ body {
   .rounded-radius {
     border-radius: var(--radius);
   }
+}
+
+Button {
+  border-radius: var(--radius);
 }

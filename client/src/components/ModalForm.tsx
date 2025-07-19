@@ -1,6 +1,6 @@
-import type {ReactNode} from 'react'
+import {type ReactNode, useRef } from 'react'
 import Modal from './Modal'
-import { DialogClose, useDialog } from '@/components/ui/dialog'
+import { DialogClose } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
 interface ModalFormProps {
@@ -29,25 +29,28 @@ export default function ModalForm({
 }
 
 function FormBody({ onSubmit, children }: { onSubmit: (data: Record<string, FormDataEntryValue>) => void; children: ReactNode }) {
-  const { setOpen } = useDialog()
+  const closeRef = useRef<HTMLButtonElement>(null);
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
         const formData = Object.fromEntries(new FormData(e.currentTarget).entries())
         onSubmit(formData)
-        setOpen(false)
+        // Close the modal after form submission
+        closeRef.current?.click();
       }}
       className="space-y-4"
     >
       {children}
       <div className="flex justify-end space-x-2">
-        <DialogClose>
-          <Button type="button" variant="secondary">
+        <DialogClose asChild>
+          <Button variant="secondary">
             Cancel
           </Button>
         </DialogClose>
         <Button type="submit">Save</Button>
+        <DialogClose ref={closeRef} className="hidden" aria-hidden="true" />
       </div>
     </form>
   )
