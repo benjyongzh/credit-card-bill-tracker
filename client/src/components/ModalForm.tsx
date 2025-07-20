@@ -37,7 +37,7 @@ export default function ModalForm({
 }
 
 function FormBody({ onSubmit, formSchema, defaultValues, children }: {
-  onSubmit: (data: Record<string, FormDataEntryValue>) => void;
+  onSubmit: (data: z.infer<typeof formSchema>) => void;
   formSchema: ZodObject<ZodRawShape>;
   defaultValues?: Record<string, any>;
   children: ReactNode | ((form: any) => ReactNode)

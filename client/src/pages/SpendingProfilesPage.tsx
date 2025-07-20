@@ -97,7 +97,7 @@ export default function SpendingProfilesPage() {
                 {selectedAccounts.length === 0 ? (
                   <p className="text-muted-foreground text-sm">No bank accounts selected</p>
                 ) : (
-                  selectedAccounts.map((accountName, index) => (
+                  selectedAccounts.map((accountName:any, index:any) => (
                     <div
                       key={index}
                       className="flex items-center gap-1 bg-primary/10 text-primary rounded-full px-3 py-1"
