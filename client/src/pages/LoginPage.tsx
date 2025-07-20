@@ -13,7 +13,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form";
 import Modal from "@/components/Modal.tsx";
-import * as test from "node:test";
 
 const formSchema = z.object({
   username: z.string()
@@ -71,7 +70,7 @@ export default function LoginPage() {
               name="username"
               render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-primary-foreground">Username</FormLabel>
+                    <FormLabel className="text-foreground">Username</FormLabel>
                     <FormControl>
                       <Input className="text-accent" placeholder="Enter your username" {...field} />
                     </FormControl>
@@ -84,7 +83,7 @@ export default function LoginPage() {
               name="password"
               render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-primary-foreground">Password</FormLabel>
+                    <FormLabel className="text-foreground">Password</FormLabel>
                     <FormControl>
                       <Input className="text-accent" placeholder="Enter your password" {...field} />
                     </FormControl>
@@ -101,8 +100,8 @@ export default function LoginPage() {
             <Button variant="secondary" onClick={googleLogin} className="bg-accent w-full">
                 Sign in with Google
             </Button>
-            <Button variant="link" onClick={onRegister} className="text-primary-foreground underline cursor-pointer -mt-1 pt-0">Dont have an account? Register</Button>
-            <Modal title="testModal" triggerLabel="test here" triggerClassName="text-primary-foreground underline cursor-pointer -mt-1 pt-0" contentClassName="text-primary-foreground" onOpen={() => console.log("test modal is open")} >
+            <Button variant="link" onClick={onRegister} className="text-foreground underline cursor-pointer -mt-1 pt-0">Dont have an account? Register</Button>
+            <Modal title="testModal" triggerLabel="test here" triggerClassName="text-foreground underline cursor-pointer -mt-1 pt-0" contentClassName="text-foreground" onOpen={() => console.log("test modal is open")} >
                 <div>
                     <p>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.

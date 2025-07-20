@@ -1,8 +1,8 @@
 import {type ReactNode, useState } from 'react'
-import AppLayout from './AppLayout'
 import { useEntityList } from '@/hooks/useEntityList'
 import ModalForm from './ModalForm'
 import { Button } from './ui/button'
+import { ZodObject, type ZodRawShape } from 'zod'
 import {
   Table,
   TableHeader,
@@ -22,13 +22,17 @@ interface Props<T extends { id: string | number }> {
   title: string
   endpoint: string
   columns: Column<T>[]
-  renderForm: (item: T | null) => ReactNode
+  formSchema: ZodObject<ZodRawShape>
+  defaultValues?: Record<string, any>
+  renderForm: (item: T | null, form?: any) => ReactNode
 }
 
 export default function ManagementPage<T extends { id: string | number }>({
   title,
   endpoint,
   columns,
+  formSchema,
+  defaultValues,
   renderForm,
 }: Props<T>) {
   const { items, create, update, remove } = useEntityList<T>(endpoint)
@@ -46,16 +50,19 @@ export default function ManagementPage<T extends { id: string | number }>({
   }
 
   return (
-    <AppLayout>
-      <h1 className="text-2xl font-bold mb-4">{title}</h1>
-      <ModalForm
-        title={`Add ${title}`}
-        triggerLabel="Add"
-        onSubmit={(data) => handleCreate(data as Partial<T>)}
+    <div className="flex flex-col gap-4 max-w-6xl mx-auto">
+      <h1 className="hidden sm:flex text-2xl font-bold text-foreground mb-4">{title}</h1>
+      <div className="w-full mt-4 flex justify-end items-center"><ModalForm
+          title={`Add ${title}`}
+          triggerLabel="Add"
+          formSchema={formSchema}
+          defaultValues={defaultValues}
+          onSubmit={(data) => handleCreate(data as Partial<T>)}
       >
-        {renderForm(null)}
-      </ModalForm>
-      <Table className="border mt-4 text-left">
+        {(form) => renderForm(null, form)}
+      </ModalForm></div>
+
+      <Table className="border text-left">
         <TableHeader>
           <TableRow>
             {columns.map((c) => (
@@ -76,13 +83,15 @@ export default function ManagementPage<T extends { id: string | number }>({
                 <ModalForm
                   title="Edit"
                   triggerLabel="Edit"
+                  formSchema={formSchema}
+                  defaultValues={{ ...defaultValues, ...item }}
                   onOpen={() => setEditing(item)}
                   onSubmit={(data) => handleUpdate(data as Partial<T>)}
                   triggerClassName="mr-2"
                 >
-                  {renderForm(item)}
+                  {(form) => renderForm(item, form)}
                 </ModalForm>
-                <Button variant="secondary" onClick={() => remove(item.id)}>
+                <Button variant="destructive" onClick={() => remove(item.id)}>
                   Delete
                 </Button>
               </TableCell>
@@ -90,6 +99,6 @@ export default function ManagementPage<T extends { id: string | number }>({
           ))}
         </TableBody>
       </Table>
-    </AppLayout>
+    </div>
   )
 }

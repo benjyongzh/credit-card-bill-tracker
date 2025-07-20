@@ -1,12 +1,10 @@
-import AppLayout from '@/components/AppLayout'
-
 export default function NotFoundPage() {
   return (
-    <AppLayout>
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">404 - Not Found</h1>
-        <p>The requested resource could not be found.</p>
+    <>
+      <div className="flex flex-col gap-4 max-w-6xl mx-auto">
+        <h1 className="hidden sm:flex text-2xl text-foreground font-bold">404 - Not Found</h1>
+        <p className="text-foreground">The requested resource could not be found.</p>
       </div>
-    </AppLayout>
+    </>
   )
 }

@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react'
-import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog'
+import {Dialog, DialogTrigger, DialogContent, DialogTitle} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
 interface ModalProps {
@@ -24,8 +24,8 @@ export default function Modal({
       <DialogTrigger onClick={onOpen}>
         <Button className={triggerClassName}>{triggerLabel}</Button>
       </DialogTrigger>
-      <DialogContent className={`bg-background/30 dark:bg-background/80 backdrop-blur-xl dark:backdrop-blur ${contentClassName}`}>
-        <h2 className="text-lg font-bold mb-4">{title}</h2>
+      <DialogContent className={`bg-background/90 dark:bg-primary/40 backdrop-blur-xl dark:backdrop-blur ${contentClassName}`}>
+        <DialogTitle className="text-foreground mb-4">{title}</DialogTitle>
         {children}
       </DialogContent>
     </Dialog>
