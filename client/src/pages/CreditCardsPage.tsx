@@ -1,31 +1,9 @@
 import ManagementPage, {type Column } from '@/components/ManagementPage'
-import {FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
+import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import { z } from "zod";
 import { Checkbox } from "@/components/ui/checkbox";
-
-interface Card {
-  id: string
-  cardName: string
-  lastFourDigits: string
-  isDefault: boolean
-}
-
-const cardSchema = z.object({
-  cardName: z.string()
-    .min(2, { message: "Card name must be at least 2 characters" })
-    .max(50, { message: "Card name must be at most 50 characters" }),
-  lastFourDigits: z.string()
-    .length(4, { message: "Must be exactly 4 digits" })
-    .regex(/^\d+$/, { message: "Must contain only digits" }),
-  isDefault: z.boolean().default(false)
-});
-
-const defaultValues = {
-  cardName: "",
-  lastFourDigits: "",
-  isDefault: false
-};
+import {RequiredLabel} from "@/components/RequiredLabel.tsx";
+import {type Card, cardSchema, cardDefaultValues} from "@/lib/dataSchema.ts";
 
 const columns: Column<Card>[] = [
   { key: 'cardName', header: 'Name' },
@@ -44,7 +22,7 @@ export default function CreditCardsPage() {
       endpoint="/cards"
       columns={columns}
       formSchema={cardSchema}
-      defaultValues={defaultValues}
+      defaultValues={cardDefaultValues}
       renderForm={(item, form) => {
         if (!form) return null;
 
@@ -55,10 +33,11 @@ export default function CreditCardsPage() {
                   name="cardName"
                   render={({ field }) => (
                       <FormItem>
-                          <FormLabel className="text-foreground">Card Name</FormLabel>
+                          <RequiredLabel className="text-foreground" required={!cardSchema.shape.cardName.optional()}>Card Name</RequiredLabel>
                           <FormControl>
-                              <Input className="text-accent" {...field} />
+                              <Input className="text-accent" placeholder="Enter card name" {...field} />
                           </FormControl>
+                          <FormDescription>e.g., Bank of American Frequent Flyer Card</FormDescription>
                           <FormMessage />
                       </FormItem>
                   )}
@@ -68,9 +47,15 @@ export default function CreditCardsPage() {
                   name="lastFourDigits"
                   render={({ field }) => (
                       <FormItem>
-                          <FormLabel className="text-foreground">Last 4 Digits</FormLabel>
+
+                          <RequiredLabel className="text-foreground" required={!cardSchema.shape.lastFourDigits.optional()}>Last 4 Digits</RequiredLabel>
                           <FormControl>
-                              <Input className="text-accent" {...field} />
+                              <Input
+                                  type="text"
+                                  inputMode="numeric"
+                                  pattern="\d*"
+                                  placeholder="Enter 4-digit code"
+                                  maxLength={4} className="text-accent" {...field} />
                           </FormControl>
                           <FormMessage />
                       </FormItem>

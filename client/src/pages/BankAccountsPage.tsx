@@ -1,28 +1,11 @@
 import ManagementPage, {type Column } from '@/components/ManagementPage'
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import { z } from "zod";
 import { Checkbox } from "@/components/ui/checkbox";
+import {type BankAccount, bankAccountDefaultValues, bankAccountSchema} from "@/lib/dataSchema.ts";
+import {RequiredLabel} from "@/components/RequiredLabel.tsx";
 
-interface Account {
-  id: string
-  name: string
-  isDefault: boolean
-}
-
-const accountSchema = z.object({
-  name: z.string()
-    .min(2, { message: "Account name must be at least 2 characters" })
-    .max(50, { message: "Account name must be at most 50 characters" }),
-  isDefault: z.boolean().default(false)
-});
-
-const defaultValues = {
-  name: "",
-  isDefault: false
-};
-
-const columns: Column<Account>[] = [
+const columns: Column<BankAccount>[] = [
   { key: 'name', header: 'Name' },
   {
     key: 'isDefault',
@@ -33,12 +16,12 @@ const columns: Column<Account>[] = [
 
 export default function BankAccountsPage() {
   return (
-    <ManagementPage<Account>
+    <ManagementPage<BankAccount>
       title="Bank Accounts"
       endpoint="/accounts"
       columns={columns}
-      formSchema={accountSchema}
-      defaultValues={defaultValues}
+      formSchema={bankAccountSchema}
+      defaultValues={bankAccountDefaultValues}
       renderForm={(item, form) => {
         if (!form) return null;
 
@@ -49,7 +32,7 @@ export default function BankAccountsPage() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">Account Name</FormLabel>
+                    <RequiredLabel className="text-foreground">Account Name</RequiredLabel>
                   <FormControl>
                     <Input className="text-accent" {...field} />
                   </FormControl>
@@ -69,9 +52,7 @@ export default function BankAccountsPage() {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel className="text-foreground">
-                      Set as default account
-                    </FormLabel>
+                      <RequiredLabel className="text-foreground">Set as default account</RequiredLabel>
                   </div>
                 </FormItem>
               )}

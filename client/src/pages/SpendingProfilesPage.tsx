@@ -1,36 +1,19 @@
 import ManagementPage, {type Column } from '@/components/ManagementPage'
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import { z } from "zod";
 import { useEntityList } from '@/hooks/useEntityList';
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { XIcon, ChevronDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+    type SpendingProfile,
+    type SpendingProfileAccount,
+    spendingProfileDefaultValues,
+    spendingProfileSchema
+} from "@/lib/dataSchema.ts";
+import {RequiredLabel} from "@/components/RequiredLabel.tsx";
 
-interface Account {
-  id: string
-  name: string
-}
-
-interface Profile {
-  id: string
-  name: string
-  bankAccounts: string[] // Array of bank account names
-}
-
-const profileSchema = z.object({
-  name: z.string()
-    .min(2, { message: "Profile name must be at least 2 characters" })
-    .max(50, { message: "Profile name must be at most 50 characters" }),
-  bankAccounts: z.array(z.string()).default([])
-});
-
-const defaultValues = {
-  name: "",
-  bankAccounts: []
-};
-
-const columns: Column<Profile>[] = [
+const columns: Column<SpendingProfile>[] = [
   { key: 'name', header: 'Name' },
   {
     key: 'bankAccounts',
@@ -40,15 +23,15 @@ const columns: Column<Profile>[] = [
 ]
 
 export default function SpendingProfilesPage() {
-  const { items: accounts } = useEntityList<Account>('/accounts');
+  const { items: accounts } = useEntityList<SpendingProfileAccount>('/accounts');
 
   return (
-    <ManagementPage<Profile>
+    <ManagementPage<SpendingProfile>
       title="Spending Categories"
       endpoint="/spending-profiles"
       columns={columns}
-      formSchema={profileSchema}
-      defaultValues={defaultValues}
+      formSchema={spendingProfileSchema}
+      defaultValues={spendingProfileDefaultValues}
       renderForm={(item, form) => {
         if (!form) return null;
 
@@ -80,7 +63,7 @@ export default function SpendingProfilesPage() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">Profile Name</FormLabel>
+                    <RequiredLabel className="text-foreground">Profile Name</RequiredLabel>
                   <FormControl>
                     <Input className="text-accent" {...field} />
                   </FormControl>
@@ -90,7 +73,7 @@ export default function SpendingProfilesPage() {
             />
 
             <div className="mt-6">
-              <FormLabel className="text-foreground block mb-2">Bank Accounts</FormLabel>
+                <RequiredLabel className="text-foreground block mb-2">Bank Accounts</RequiredLabel>
 
               {/* Display selected accounts as chips/pills */}
               <div className="flex flex-wrap gap-2 mb-2">
