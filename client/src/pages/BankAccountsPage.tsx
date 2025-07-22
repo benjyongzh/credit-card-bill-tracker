@@ -18,6 +18,8 @@ export default function BankAccountsPage() {
   return (
     <ManagementPage<BankAccount>
       title="Bank Accounts"
+      titleShortForm="Accounts"
+      subtitle="Your bank accounts will be used to pay off credit card bills."
       endpoint="/accounts"
       columns={columns}
       formSchema={bankAccountSchema}

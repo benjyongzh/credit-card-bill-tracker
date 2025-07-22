@@ -21,7 +21,7 @@ export default function Modal({
 }: ModalProps) {
   return (
     <Dialog>
-      <DialogTrigger onClick={onOpen}>
+      <DialogTrigger asChild={true} onClick={onOpen}>
         <Button className={triggerClassName}>{triggerLabel}</Button>
       </DialogTrigger>
       <DialogContent className={`bg-background/90 dark:bg-primary/40 backdrop-blur-xl dark:backdrop-blur ${contentClassName}`}>

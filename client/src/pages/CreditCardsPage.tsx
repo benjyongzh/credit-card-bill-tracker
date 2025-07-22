@@ -19,6 +19,8 @@ export default function CreditCardsPage() {
   return (
     <ManagementPage<Card>
       title="Credit Cards"
+      titleShortForm="Cards"
+      subtitle="Expenses are recorded against your credit cards."
       endpoint="/cards"
       columns={columns}
       formSchema={cardSchema}

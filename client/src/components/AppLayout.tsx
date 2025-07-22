@@ -31,7 +31,7 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
       {/* mobile sidebar */}
         <aside
             className={cn(
-                'bg-sidebar text-sidebar-foreground w-64 border-r p-4 z-30 transition-transform sm:hidden',
+                'bg-background dark:bg-background/80 text-foreground w-72 p-4 z-30 transition-transform sm:hidden',
                 open ? 'translate-x-0 fixed inset-y-0 left-0' : '-translate-x-full fixed inset-y-0 left-0',
                 'flex flex-col' // make aside a flex column container
             )}
@@ -46,29 +46,29 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
             </Button>
 
             <nav className="flex flex-col gap-4 flex-1">
-                <NavLink to="/credit-cards">Cards</NavLink>
-                <NavLink to="/bank-accounts">Accounts</NavLink>
-                <NavLink to="/spending-profiles">Categories</NavLink>
+                <NavLink className="font-bold" to="/credit-cards">Cards</NavLink>
+                <NavLink className="font-bold" to="/bank-accounts">Accounts</NavLink>
+                <NavLink className="font-bold" to="/spending-profiles">Categories</NavLink>
             </nav>
 
             <Button
                 variant="destructive"
                 onClick={logout}
-                className="text-left mt-auto"
+                className="text-left mt-auto button-destructive"
             >
                 Logout
             </Button>
         </aside>
 
       {/* desktop navbar */}
-      <header className="hidden sm:flex items-center justify-end bg-sidebar gap-6 text-sidebar-foreground p-4">
+      <header className="hidden sm:flex items-center justify-end gap-6 text-foreground p-4 border-b border-muted">
         <nav className="flex items-center space-x-8">
-          <NavLink className="fixed left-5 text-foreground" to="/">Credit Card Bill Tracker</NavLink>
-          <NavLink to="/credit-cards">Cards</NavLink>
-          <NavLink to="/bank-accounts">Accounts</NavLink>
-            <NavLink to="/spending-profiles">Categories</NavLink>
+          <NavLink className="fixed left-5 text-foreground font-bold" to="/">Credit Card Bill Tracker</NavLink>
+          <NavLink className="font-bold" to="/credit-cards">Cards</NavLink>
+          <NavLink className="font-bold" to="/bank-accounts">Accounts</NavLink>
+            <NavLink className="font-bold" to="/spending-profiles">Categories</NavLink>
         </nav>
-        <Button variant="destructive" onClick={logout}>Logout</Button>
+        <Button variant="destructive" className="button-destructive" onClick={logout}>Logout</Button>
       </header>
 
       <main className="flex-1 p-4">

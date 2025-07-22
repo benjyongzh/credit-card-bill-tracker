@@ -28,6 +28,8 @@ export default function SpendingProfilesPage() {
   return (
     <ManagementPage<SpendingProfile>
       title="Spending Categories"
+      titleShortForm="Categories"
+      subtitle="Categorize your expenses. You can assign multiple bank accounts to a spending category."
       endpoint="/spending-profiles"
       columns={columns}
       formSchema={spendingProfileSchema}

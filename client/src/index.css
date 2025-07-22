@@ -266,6 +266,18 @@ body {
   .rounded-radius {
     border-radius: var(--radius);
   }
+
+  .page-title {
+    @apply hidden sm:flex text-4xl font-bold text-foreground;
+  }
+
+  .button-primary {
+    @apply text-primary-foreground hover:text-primary-foreground/80;
+  }
+
+  .button-destructive {
+    @apply text-destructive-foreground hover:text-destructive-foreground/80;
+  }
 }
 
 Button {

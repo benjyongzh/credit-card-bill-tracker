@@ -26,11 +26,12 @@ export default function ModalForm({
   formSchema,
   defaultValues,
   children,
+  triggerClassName,
   onOpen,
   ...rest
 }: ModalFormProps) {
   return (
-    <Modal title={title} triggerLabel={triggerLabel} onOpen={onOpen} {...rest}>
+    <Modal title={title} triggerLabel={triggerLabel} triggerClassName={triggerClassName} onOpen={onOpen} {...rest}>
       <FormBody onSubmit={onSubmit} formSchema={formSchema} defaultValues={defaultValues}>{children}</FormBody>
     </Modal>
   )

@@ -20,6 +20,8 @@ export interface Column<T> {
 
 interface Props<T extends { id: string | number }> {
   title: string
+  titleShortForm: string
+  subtitle?: string
   endpoint: string
   columns: Column<T>[]
   formSchema: ZodObject<ZodRawShape>
@@ -29,6 +31,8 @@ interface Props<T extends { id: string | number }> {
 
 export default function ManagementPage<T extends { id: string | number }>({
   title,
+  titleShortForm,
+  subtitle,
   endpoint,
   columns,
   formSchema,
@@ -51,18 +55,25 @@ export default function ManagementPage<T extends { id: string | number }>({
 
   return (
     <div className="flex flex-col gap-4 max-w-6xl mx-auto">
-      <h1 className="hidden sm:flex text-2xl font-bold text-foreground mb-4">{title}</h1>
-      <div className="w-full mt-4 flex justify-end items-center"><ModalForm
-          title={`Add ${title}`}
-          triggerLabel="Add"
-          formSchema={formSchema}
-          defaultValues={defaultValues}
-          onSubmit={(data) => handleCreate(data as Partial<T>)}
-      >
-        {(form) => renderForm(null, form)}
-      </ModalForm></div>
+      <div className="flex items-center justify-between w-full mt-6">
+        <h1 className="page-title">{title}</h1>
+        <div className="w-full sm:w-auto flex justify-center items-center">
+          <ModalForm
+              title={`Add ${title}`}
+              triggerLabel={`Add ${titleShortForm}`}
+              triggerClassName="w-full sm:w-auto button-primary"
+              formSchema={formSchema}
+              defaultValues={defaultValues}
+              onSubmit={(data) => handleCreate(data as Partial<T>)}
+          >
+            {(form) => renderForm(null, form)}
+          </ModalForm>
+        </div>
+      </div>
+      {subtitle && (<div className="hidden sm:flex text-muted-foreground">{subtitle}</div>)}
 
-      <Table className="border text-left">
+
+      <Table className="border text-left mt-4">
         <TableHeader>
           <TableRow>
             {columns.map((c) => (
