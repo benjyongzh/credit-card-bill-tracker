@@ -9,5 +9,8 @@
     <!-- Include the init changelog -->
     <include file="db/changelog/db.changelog-init.xml"/>
 
+    <!-- Seed data for local testing -->
+    <include file="db/changelog/db.changelog-testdata.xml"/>
+
     <!-- Future changelogs will be included here -->
 </databaseChangeLog>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+       http://www.liquibase.org/xml/ns/dbchangelog
+       https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.15.xsd">
+
+    <changeSet id="seed-test-data" author="codex">
+        <!-- Insert demo user -->
+        <insert tableName="users">
+            <column name="id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="username" value="demo"/>
+            <column name="email" value="demo@example.com"/>
+            <column name="password_hash" value="$2a$10$7EqJtq98hPqEX7fNZaFWoOa5r4rE9FjmG9tm3./KYmGd/bCA.3PYy"/>
+            <column name="role" value="user"/>
+        </insert>
+
+        <!-- Credit card and bank account for demo user -->
+        <insert tableName="credit_cards">
+            <column name="id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="card_name" value="Visa Platinum"/>
+            <column name="last_four_digits" value="1234"/>
+        </insert>
+
+        <insert tableName="bank_accounts">
+            <column name="id" value="22222222-2222-2222-2222-222222222222"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="Main Checking"/>
+            <column name="is_default" valueBoolean="true"/>
+            <column name="default_card_id" value="44444444-4444-4444-4444-444444444444"/>
+        </insert>
+
+        <!-- Additional bank account for testing -->
+        <insert tableName="bank_accounts">
+            <column name="id" value="33333333-3333-3333-3333-333333333333"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="Savings"/>
+            <column name="is_default" valueBoolean="false"/>
+            <column name="default_card_id" value="44444444-4444-4444-4444-444444444444"/>
+        </insert>
+
+        <!-- Sample expense paid with the demo card -->
+        <insert tableName="expenses">
+            <column name="id" value="88888888-8888-8888-8888-888888888888"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="credit_card_id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="date" valueDate="2024-01-05"/>
+            <column name="amount" valueNumeric="50.00"/>
+            <column name="description" value="Groceries"/>
+        </insert>
+
+        <!-- Link expense to the bank account -->
+        <insert tableName="expense_bank_accounts">
+            <column name="expense_id" value="88888888-8888-8888-8888-888888888888"/>
+            <column name="bank_account_id" value="22222222-2222-2222-2222-222222222222"/>
+        </insert>
+
+        <!-- Additional expenses for multiple profiles -->
+        <insert tableName="expenses">
+            <column name="id" value="88888888-8888-8888-8888-888888888889"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="credit_card_id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="date" valueDate="2024-01-06"/>
+            <column name="amount" valueNumeric="40.00"/>
+            <column name="description" value="Fuel"/>
+        </insert>
+
+        <insert tableName="expense_bank_accounts">
+            <column name="expense_id" value="88888888-8888-8888-8888-888888888889"/>
+            <column name="bank_account_id" value="33333333-3333-3333-3333-333333333333"/>
+        </insert>
+
+        <insert tableName="expenses">
+            <column name="id" value="88888888-8888-8888-8888-888888888890"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="credit_card_id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="date" valueDate="2024-01-07"/>
+            <column name="amount" valueNumeric="30.00"/>
+            <column name="description" value="Dinner"/>
+        </insert>
+
+        <insert tableName="expense_bank_accounts">
+            <column name="expense_id" value="88888888-8888-8888-8888-888888888890"/>
+            <column name="bank_account_id" value="22222222-2222-2222-2222-222222222222"/>
+        </insert>
+        <insert tableName="expense_bank_accounts">
+            <column name="expense_id" value="88888888-8888-8888-8888-888888888890"/>
+            <column name="bank_account_id" value="33333333-3333-3333-3333-333333333333"/>
+        </insert>
+
+        <insert tableName="expenses">
+            <column name="id" value="88888888-8888-8888-8888-888888888891"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="credit_card_id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="date" valueDate="2024-01-08"/>
+            <column name="amount" valueNumeric="20.00"/>
+            <column name="description" value="Stationery"/>
+        </insert>
+
+        <insert tableName="expense_bank_accounts">
+            <column name="expense_id" value="88888888-8888-8888-8888-888888888891"/>
+            <column name="bank_account_id" value="22222222-2222-2222-2222-222222222222"/>
+        </insert>
+
+        <!-- Sample bill payment for the card -->
+        <insert tableName="bill_payment">
+            <column name="id" value="66666666-6666-6666-6666-666666666666"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="from_account_id" value="22222222-2222-2222-2222-222222222222"/>
+            <column name="to_card_id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="amount" valueNumeric="25.00"/>
+            <column name="date" valueDate="2024-01-10"/>
+            <column name="completed" valueBoolean="true"/>
+        </insert>
+
+        <insert tableName="bill_payment">
+            <column name="id" value="66666666-6666-6666-6666-666666666667"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="from_account_id" value="33333333-3333-3333-3333-333333333333"/>
+            <column name="to_card_id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="amount" valueNumeric="20.00"/>
+            <column name="date" valueDate="2024-01-15"/>
+            <column name="completed" valueBoolean="true"/>
+        </insert>
+
+        <insert tableName="bill_payment">
+            <column name="id" value="66666666-6666-6666-6666-666666666668"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="from_account_id" value="22222222-2222-2222-2222-222222222222"/>
+            <column name="to_card_id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="amount" valueNumeric="30.00"/>
+            <column name="date" valueDate="2024-01-20"/>
+            <column name="completed" valueBoolean="true"/>
+        </insert>
+
+        <insert tableName="bill_payment">
+            <column name="id" value="66666666-6666-6666-6666-666666666669"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="from_account_id" value="33333333-3333-3333-3333-333333333333"/>
+            <column name="to_card_id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="amount" valueNumeric="10.00"/>
+            <column name="date" valueDate="2024-01-25"/>
+            <column name="completed" valueBoolean="true"/>
+        </insert>
+
+        <!-- Billing cycle with the payment -->
+        <insert tableName="billing_cycles">
+            <column name="id" value="77777777-7777-7777-7777-777777777777"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="label" value="January 2024"/>
+            <column name="completed_date" valueDate="2024-01-31"/>
+        </insert>
+
+        <insert tableName="billing_cycle_payments">
+            <column name="billing_cycle_id" value="77777777-7777-7777-7777-777777777777"/>
+            <column name="bill_payment_id" value="66666666-6666-6666-6666-666666666666"/>
+        </insert>
+
+        <insert tableName="billing_cycle_payments">
+            <column name="billing_cycle_id" value="77777777-7777-7777-7777-777777777777"/>
+            <column name="bill_payment_id" value="66666666-6666-6666-6666-666666666667"/>
+        </insert>
+
+        <insert tableName="billing_cycle_payments">
+            <column name="billing_cycle_id" value="77777777-7777-7777-7777-777777777777"/>
+            <column name="bill_payment_id" value="66666666-6666-6666-6666-666666666668"/>
+        </insert>
+
+        <insert tableName="billing_cycle_payments">
+            <column name="billing_cycle_id" value="77777777-7777-7777-7777-777777777777"/>
+            <column name="bill_payment_id" value="66666666-6666-6666-6666-666666666669"/>
+        </insert>
+
+        <!-- Expense summary record -->
+        <insert tableName="expense_summaries">
+            <column name="id" value="99999999-9999-9999-9999-999999999999"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="from_account_id" value="22222222-2222-2222-2222-222222222222"/>
+            <column name="to_id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="to_type" value="CARD"/>
+            <column name="total_expense" valueNumeric="50.00"/>
+            <column name="total_paid" valueNumeric="25.00"/>
+        </insert>
+
+        <!-- Spending profile referencing the account -->
+        <insert tableName="spending_profiles">
+            <column name="id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="Everyday"/>
+        </insert>
+
+        <insert tableName="spending_profile_bank_accounts">
+            <column name="profile_id" value="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"/>
+            <column name="bank_account_id" value="22222222-2222-2222-2222-222222222222"/>
+        </insert>
+
+        <!-- Spending profile using both bank accounts -->
+        <insert tableName="spending_profiles">
+            <column name="id" value="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="Split"/>
+        </insert>
+
+        <insert tableName="spending_profile_bank_accounts">
+            <column name="profile_id" value="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"/>
+            <column name="bank_account_id" value="22222222-2222-2222-2222-222222222222"/>
+        </insert>
+        <insert tableName="spending_profile_bank_accounts">
+            <column name="profile_id" value="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"/>
+            <column name="bank_account_id" value="33333333-3333-3333-3333-333333333333"/>
+        </insert>
+
+        <!-- Spending profile using only the second account -->
+        <insert tableName="spending_profiles">
+            <column name="id" value="cccccccc-cccc-cccc-cccc-cccccccccccc"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="Secondary"/>
+        </insert>
+
+        <insert tableName="spending_profile_bank_accounts">
+            <column name="profile_id" value="cccccccc-cccc-cccc-cccc-cccccccccccc"/>
+            <column name="bank_account_id" value="33333333-3333-3333-3333-333333333333"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
