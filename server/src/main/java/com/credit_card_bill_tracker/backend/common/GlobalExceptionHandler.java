@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ApiError> handleAppException(AppException ex) {
         ApiError error = new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ex.getStatusCode(),
                 "Application Error",
                 ex.getMessage(),
                 ex.getDetails()
@@ -103,7 +103,7 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Runtime Error",
-                "An unexpected server error occurred."
+                ex.getMessage() != null ? ex.getMessage() : "An unexpected server error occurred."
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }

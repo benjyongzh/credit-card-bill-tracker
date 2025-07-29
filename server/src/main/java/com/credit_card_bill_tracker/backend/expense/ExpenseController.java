@@ -1,13 +1,12 @@
 package com.credit_card_bill_tracker.backend.expense;
 
-import com.credit_card_bill_tracker.backend.common.ApiResponse;
-import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import com.credit_card_bill_tracker.backend.user.User;
 import com.credit_card_bill_tracker.backend.expense.ExpenseRequestDTO;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +22,9 @@ public class ExpenseController {
 
     @Operation(summary = "Get expenses", description = "Returns expenses for the user, optionally filtered by credit card")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ExpenseResponseDTO>>> get(@AuthenticationPrincipal User user, @RequestParam(required = false) UUID cardId) {
+    public ResponseEntity<List<ExpenseResponseDTO>> get(@AuthenticationPrincipal User user, @RequestParam(required = false) UUID cardId) {
         List<ExpenseResponseDTO> result = service.getAll(user, cardId);
-        return ApiResponseBuilder.ok(result);
+        return ResponseEntity.ok(result);
     }
 
 //    @PostMapping
@@ -37,26 +36,26 @@ public class ExpenseController {
 
     @Operation(summary = "Create expense", description = "Adds an expense and updates the related spending profile")
     @PostMapping
-    public ResponseEntity<ApiResponse<ExpenseResponseDTO>> createExpenseWithProfile(
+    public ResponseEntity<ExpenseResponseDTO> createExpenseWithProfile(
             @AuthenticationPrincipal User user,
             @RequestParam UUID spendingProfileId,
             @Valid @RequestBody ExpenseRequestDTO dto
     ) {
         ExpenseResponseDTO result = service.createWithSpendingProfile(user, dto, spendingProfileId);
-        return ApiResponseBuilder.created(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @Operation(summary = "Update expense", description = "Modifies an existing expense")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ExpenseResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @Valid @RequestBody ExpenseRequestDTO dto) {
+    public ResponseEntity<ExpenseResponseDTO> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @Valid @RequestBody ExpenseRequestDTO dto) {
         ExpenseResponseDTO result = service.update(user, id, dto);
-        return ApiResponseBuilder.accepted(result);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
     }
 
     @Operation(summary = "Delete expense", description = "Removes the specified expense record")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
         service.delete(user, id);
-        return ApiResponseBuilder.noContent();
+        return ResponseEntity.noContent().build();
     }
 }

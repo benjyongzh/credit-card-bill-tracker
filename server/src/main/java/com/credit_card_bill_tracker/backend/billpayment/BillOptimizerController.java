@@ -1,11 +1,9 @@
 package com.credit_card_bill_tracker.backend.billpayment;
 
-import com.credit_card_bill_tracker.backend.common.ApiResponse;
-import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
+import org.springframework.http.ResponseEntity;
 import com.credit_card_bill_tracker.backend.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +20,11 @@ public class BillOptimizerController {
 
     @Operation(summary = "Get bill optimization suggestions", description = "Computes optimal bill payment suggestions using the provided strategy")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<BillSuggestionDTO>>> getOptimized(
+    public ResponseEntity<List<BillSuggestionDTO>> getOptimized(
             @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = OptimizationStrategy.DEFAULT) OptimizationStrategy strategy) {
         List<BillSuggestionDTO> result = service.computeBillSuggestions(user, strategy);
-        return ApiResponseBuilder.ok(result);
+        return ResponseEntity.ok(result);
     }
 
     @InitBinder
