@@ -61,3 +61,39 @@ export const spendingProfileDefaultValues = {
     name: "",
     bankAccounts: []
 };
+export interface BillPayment {
+    id: string
+    fromAccountId: string
+    toCardId: string | null
+    toAccountId: string | null
+    amount: number
+    date: string
+    completed: boolean
+}
+
+export interface BillingCycle {
+    id: string
+    label: string
+    completedDate: string
+    billPayments: BillPayment[]
+}
+
+export interface ExpenseSummary {
+    id: string
+    fromAccountId: string
+    toId: string
+    toType: 'CARD' | 'ACCOUNT'
+    totalExpense: number
+    totalPaid: number
+    remaining: number
+}
+
+export interface Expense {
+    id: string
+    userId: string
+    creditCardId: string
+    date: string
+    amount: number
+    description: string
+    bankAccountIds: string[]
+}
