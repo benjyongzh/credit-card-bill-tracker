@@ -1,14 +1,13 @@
 package com.credit_card_bill_tracker.backend.billpayment;
 
 import com.credit_card_bill_tracker.backend.billingcycle.BillingCycleResponseDTO;
-import com.credit_card_bill_tracker.backend.common.ApiResponse;
-import com.credit_card_bill_tracker.backend.common.ApiResponseBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import com.credit_card_bill_tracker.backend.user.User;
 import com.credit_card_bill_tracker.backend.billpayment.BillPaymentRequestDTO;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,36 +23,36 @@ public class BillPaymentController {
 
     @Operation(summary = "Get bill payments", description = "Returns a list of scheduled bill payments")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<BillPaymentResponseDTO>>> getAll(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<BillPaymentResponseDTO>> getAll(@AuthenticationPrincipal User user) {
         List<BillPaymentResponseDTO> result = service.getAll(user);
-        return ApiResponseBuilder.ok(result);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Create bill payment", description = "Registers a new payment for a bill")
     @PostMapping
-    public ResponseEntity<ApiResponse<BillPaymentResponseDTO>> create(@AuthenticationPrincipal User user, @Valid @RequestBody BillPaymentRequestDTO dto) {
+    public ResponseEntity<BillPaymentResponseDTO> create(@AuthenticationPrincipal User user, @Valid @RequestBody BillPaymentRequestDTO dto) {
         BillPaymentResponseDTO result = service.create(user, dto);
-        return ApiResponseBuilder.created(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @Operation(summary = "Update bill payment", description = "Updates a registered bill payment")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<BillPaymentResponseDTO>> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @Valid @RequestBody BillPaymentRequestDTO dto) {
+    public ResponseEntity<BillPaymentResponseDTO> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @Valid @RequestBody BillPaymentRequestDTO dto) {
         BillPaymentResponseDTO result = service.update(user, id, dto);
-        return ApiResponseBuilder.accepted(result);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
     }
 
     @Operation(summary = "Delete bill payment", description = "Removes the specified bill payment")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
         service.delete(user, id);
-        return ApiResponseBuilder.noContent();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Complete billing cycle", description = "Marks the current billing cycle's bills as paid")
     @PostMapping("/complete")
-    public ResponseEntity<ApiResponse<BillingCycleResponseDTO>> markAsComplete(@AuthenticationPrincipal User user) {
+    public ResponseEntity<BillingCycleResponseDTO> markAsComplete(@AuthenticationPrincipal User user) {
         BillingCycleResponseDTO result = service.markBillsComplete(user);
-        return ApiResponseBuilder.accepted(result);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
     }
 }
