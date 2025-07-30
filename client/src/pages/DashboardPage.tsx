@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react'
+import { formatNumber } from 'accounting-js'
 import {
   bankAccountApi,
   billPaymentApi,
@@ -147,7 +148,7 @@ export default function DashboardPage() {
               {unpaid.map((u) => (
                 <tr key={u.cardId} className="border-t">
                   <td className="p-2">{u.cardName}</td>
-                  <td className="p-2">{u.amount.toFixed(2)}</td>
+                  <td className="p-2">{formatNumber(u.amount, 2)}</td>
                 </tr>
               ))}
             </tbody>
@@ -167,7 +168,7 @@ export default function DashboardPage() {
               {accountTotals.map((a) => (
                 <tr key={a.accountId} className="border-t">
                   <td className="p-2">{a.accountName}</td>
-                  <td className="p-2">{a.amount.toFixed(2)}</td>
+                  <td className="p-2">{formatNumber(a.amount, 2)}</td>
                 </tr>
               ))}
             </tbody>
