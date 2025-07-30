@@ -5,6 +5,7 @@ import DashboardPage from "@/pages/DashboardPage.tsx";
 import CreditCardsPage from './pages/CreditCardsPage'
 import BankAccountsPage from './pages/BankAccountsPage'
 import SpendingProfilesPage from './pages/SpendingProfilesPage'
+import BillingCyclePlannerPage from './pages/BillingCyclePlannerPage'
 import NotFoundPage from './pages/NotFoundPage'
 import { useAuthStore } from './store/auth'
 import {useState} from "react";
@@ -26,6 +27,7 @@ export default function App() {
                               <Route path="/credit-cards" element={<CreditCardsPage />} />
                               <Route path="/bank-accounts" element={<BankAccountsPage />} />
                               <Route path="/spending-profiles" element={<SpendingProfilesPage />} />
+                              <Route path="/billing-cycle" element={<BillingCyclePlannerPage />} />
                               <Route path="/not-found" element={<NotFoundPage />} />
                               <Route path="*" element={<NotFoundPage />} />
                           </Routes>
@@ -37,6 +39,7 @@ export default function App() {
                               <Route path="/credit-cards" element={<CreditCardsPage />} />
                               <Route path="/bank-accounts" element={<BankAccountsPage />} />
                               <Route path="/spending-profiles" element={<SpendingProfilesPage />} />
+                              <Route path="/billing-cycle" element={<BillingCyclePlannerPage />} />
                               <Route path="/not-found" element={<NotFoundPage />} />
                               <Route path="*" element={<NotFoundPage />} />
                           </Routes>
