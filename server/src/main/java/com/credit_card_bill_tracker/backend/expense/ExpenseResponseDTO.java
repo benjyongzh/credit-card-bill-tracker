@@ -15,4 +15,5 @@ public class ExpenseResponseDTO {
     private double amount;
     private String description;
     private List<UUID> bankAccountIds;
+    private UUID billingCycleId;
 }

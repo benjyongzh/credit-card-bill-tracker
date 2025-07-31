@@ -66,16 +66,17 @@ export interface BillPayment {
     fromAccountId: string
     toCardId: string | null
     toAccountId: string | null
+    billingCycleId: string
     amount: number
     date: string
-    completed: boolean
 }
 
 export interface BillingCycle {
     id: string
     label: string
+    month: string
     completedDate: string
-    billPayments: BillPayment[]
+    updatedAt: string
 }
 
 export interface ExpenseSummary {
@@ -92,6 +93,7 @@ export interface Expense {
     id: string
     userId: string
     creditCardId: string
+    billingCycleId: string
     date: string
     amount: number
     description: string

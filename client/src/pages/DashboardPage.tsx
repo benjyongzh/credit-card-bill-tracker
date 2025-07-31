@@ -83,7 +83,7 @@ export default function DashboardPage() {
         }
       }
       for (const p of payments) {
-        if (p.toCardId && p.completed) {
+        if (p.toCardId) {
           const entry = unpaidMap[p.toCardId]
           if (entry) entry.amount -= p.amount
         }
@@ -112,10 +112,9 @@ export default function DashboardPage() {
         .sort((a, b) => dayjs(a.completedDate).unix() - dayjs(b.completedDate).unix())
         .map((c) => {
           const key = dayjs(c.completedDate).format('YYYY-MM')
-          const paymentsTotal = c.billPayments.reduce(
-            (sum, bp) => sum + bp.amount,
-            0,
-          )
+          const paymentsTotal = payments
+            .filter((p) => p.billingCycleId === c.id)
+            .reduce((sum, bp) => sum + bp.amount, 0)
           return {
             label: c.label,
             expenses: expenseGroup[key] || 0,

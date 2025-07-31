@@ -54,13 +54,10 @@ public class ExpenseService {
 //    }
 
     public ExpenseResponseDTO createWithSpendingProfile(User user, ExpenseRequestDTO dto, UUID spendingProfileId) {
-        Expense entity = new Expense();
+        Expense entity = mapper.fromDto(dto);
         entity.setUser(user);
         entity.setCreditCard(creditCardRepo.findById(dto.getCreditCardId())
                 .orElseThrow(() -> new ResourceNotFoundException("Credit card not found")));
-        entity.setDate(dto.getDate());
-        entity.setAmount(dto.getAmount());
-        entity.setDescription(dto.getDescription());
 
         SpendingProfile profile = spendingProfileRepo.findById(spendingProfileId)
                 .filter(p -> p.getUser().getId().equals(user.getId()))

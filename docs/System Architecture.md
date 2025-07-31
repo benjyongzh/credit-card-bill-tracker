@@ -79,6 +79,7 @@ erDiagram
         UUID id PK
         UUID user_id FK
         UUID credit_card_id FK
+        UUID billing_cycle_id FK
         date date
         double amount
         string description
@@ -92,9 +93,9 @@ erDiagram
         UUID from_account_id FK
         UUID to_card_id FK
         UUID to_account_id FK
+        UUID billing_cycle_id FK
         double amount
         date date
-        boolean completed
         datetime created_at
         datetime updated_at
         datetime deleted_at
@@ -103,6 +104,7 @@ erDiagram
         UUID id PK
         UUID user_id FK
         string label
+        string month
         date completed_date
         datetime created_at
         datetime updated_at
@@ -140,6 +142,7 @@ erDiagram
     bank_accounts ||--o{ bill_payments : sends
     credit_cards ||--o{ bill_payments : receives
     billing_cycles ||--o{ bill_payments : contains
+    billing_cycles ||--o{ expenses : includes
     bank_accounts }o--o{ spending_profiles : "belongs to"
 ```
 
@@ -186,6 +189,7 @@ erDiagram
 | id | UUID | primary key |
 | user_id | UUID | FK to users |
 | credit_card_id | UUID | FK to credit_cards |
+| billing_cycle_id | UUID | FK to billing_cycles |
 | date | date | transaction date |
 | amount | double | amount spent |
 | description | string | merchant or notes |
@@ -201,9 +205,9 @@ erDiagram
 | from_account_id | UUID | FK to bank_accounts |
 | to_card_id | UUID | FK to credit_cards |
 | to_account_id | UUID | FK to bank_accounts |
+| billing_cycle_id | UUID | FK to billing_cycles |
 | amount | double | payment amount |
 | date | date | payment date |
-| completed | boolean | if payment executed |
 | created_at | datetime | record creation |
 | updated_at | datetime | last update |
 | deleted_at | datetime | soft delete timestamp |
@@ -213,7 +217,8 @@ erDiagram
 | --- | --- | --- |
 | id | UUID | primary key |
 | user_id | UUID | FK to users |
-| label | string | cycle name |
+| label | string | cycle name, unique per user |
+| month | string | target month, unique per user |
 | completed_date | date | closing date |
 | created_at | datetime | record creation |
 | updated_at | datetime | last update |
@@ -238,7 +243,7 @@ erDiagram
 | --- | --- | --- |
 | id | UUID | primary key |
 | user_id | UUID | FK to users |
-| name | string | profile label |
+| name | string | profile label, unique per user |
 | created_at | datetime | record creation |
 | updated_at | datetime | last update |
 | deleted_at | datetime | soft delete timestamp |

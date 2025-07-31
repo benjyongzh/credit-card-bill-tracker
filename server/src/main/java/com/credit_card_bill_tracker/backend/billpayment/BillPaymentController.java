@@ -1,6 +1,5 @@
 package com.credit_card_bill_tracker.backend.billpayment;
 
-import com.credit_card_bill_tracker.backend.billingcycle.BillingCycleResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import com.credit_card_bill_tracker.backend.user.User;
@@ -49,10 +48,4 @@ public class BillPaymentController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Complete billing cycle", description = "Marks the current billing cycle's bills as paid")
-    @PostMapping("/complete")
-    public ResponseEntity<BillingCycleResponseDTO> markAsComplete(@AuthenticationPrincipal User user) {
-        BillingCycleResponseDTO result = service.markBillsComplete(user);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
-    }
 }

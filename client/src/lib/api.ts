@@ -74,6 +74,7 @@ export const billingCycleApi = {
   remove: (id: string) => api.delete(`/billing-cycles/${id}`),
   getDeferredBills: (id: string) =>
     api.get(`/billing-cycles/${id}/deferred-bills`),
+  complete: (id: string) => api.post(`/billing-cycles/${id}/complete`),
 }
 
 // -------- Bill Payments --------
@@ -82,7 +83,6 @@ export const billPaymentApi = {
   create: (payload: unknown) => api.post('/bills', payload),
   update: (id: string, payload: unknown) => api.put(`/bills/${id}`, payload),
   remove: (id: string) => api.delete(`/bills/${id}`),
-  markComplete: () => api.post('/bills/complete'),
 }
 
 // -------- Bill Optimizer --------

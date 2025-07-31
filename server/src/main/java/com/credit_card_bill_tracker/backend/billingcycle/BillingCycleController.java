@@ -53,6 +53,13 @@ public class BillingCycleController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
     }
 
+    @Operation(summary = "Complete billing cycle", description = "Marks the cycle as completed")
+    @PostMapping("/{id}/complete")
+    public ResponseEntity<BillingCycleResponseDTO> complete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
+        BillingCycleResponseDTO result = service.complete(user, id);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
+    }
+
     @Operation(summary = "Delete billing cycle", description = "Deletes the specified billing cycle")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@AuthenticationPrincipal User user, @PathVariable UUID id) {
