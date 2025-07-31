@@ -1,17 +1,12 @@
 package com.credit_card_bill_tracker.backend.billpayment;
 
-import com.credit_card_bill_tracker.backend.billingcycle.*;
 import com.credit_card_bill_tracker.backend.billpayment.BillPaymentRequestDTO;
-import com.credit_card_bill_tracker.backend.common.BaseEntity;
-import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
 import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.expensesummary.ExpenseSummaryService;
 import com.credit_card_bill_tracker.backend.user.User;
-import com.credit_card_bill_tracker.backend.billingcycle.BillingCycleRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +16,6 @@ public class BillPaymentService {
 
     private final BillPaymentRepository billPaymentRepository;
     private final BillPaymentMapper billPaymentMapper;
-    private final BillingCycleService cycleService;
     private final ExpenseSummaryService summaryService;
 
     public List<BillPaymentResponseDTO> getAll(User user) {
@@ -33,7 +27,6 @@ public class BillPaymentService {
     public BillPaymentResponseDTO create(User user, BillPaymentRequestDTO dto) {
         BillPayment entity = billPaymentMapper.fromDto(dto);
         entity.setUser(user);
-        entity.setCompleted(false);
 
         BillPayment saved = billPaymentRepository.save(entity);
         summaryService.updateFromBillPayment(user, saved, true);
@@ -69,18 +62,4 @@ public class BillPaymentService {
         billPaymentRepository.save(entity);
     }
 
-    public BillingCycleResponseDTO markBillsComplete(User user) {
-        List<BillPayment> inProgress = billPaymentRepository.findByUserIdAndCompletedFalse(user.getId());
-        if (inProgress.isEmpty()) throw new BadRequestException("No bill payments to complete.");
-        for (BillPayment bp : inProgress) {
-            bp.setCompleted(true);
-        }
-        billPaymentRepository.saveAll(inProgress);
-        BillingCycleRequestDTO cycle = new BillingCycleRequestDTO();
-        cycle.setBillPaymentIds(inProgress.stream().map(BaseEntity::getId).toList());
-        LocalDate now = LocalDate.now();
-        cycle.setCompletedDate(now);
-        cycle.setLabel(cycleService.setNewBillingCycleDefaultLabel(now));
-        return cycleService.create(user, cycle);
-    }
 }

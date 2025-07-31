@@ -15,4 +15,5 @@ public class ExpenseRequestDTO {
     @Size(max = 255)
     private String description;
     private List<UUID> bankAccountIds;
+    private UUID billingCycleId;
 }

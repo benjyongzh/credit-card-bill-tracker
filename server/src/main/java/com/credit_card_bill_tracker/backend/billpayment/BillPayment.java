@@ -2,11 +2,11 @@ package com.credit_card_bill_tracker.backend.billpayment;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.common.BaseEntity;
+import com.credit_card_bill_tracker.backend.billingcycle.BillingCycle;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -33,6 +33,7 @@ public class BillPayment extends BaseEntity {
 
     private LocalDate date;
 
-    @Column(nullable = false)
-    private boolean completed = false;
+
+    @ManyToOne(optional = false)
+    private BillingCycle billingCycle;
 }

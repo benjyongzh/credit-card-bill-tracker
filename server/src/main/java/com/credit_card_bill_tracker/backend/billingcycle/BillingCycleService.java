@@ -1,9 +1,15 @@
 package com.credit_card_bill_tracker.backend.billingcycle;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
-import com.credit_card_bill_tracker.backend.billpayment.*;
+import com.credit_card_bill_tracker.backend.billpayment.BillOptimizerService;
+import com.credit_card_bill_tracker.backend.billpayment.BillSuggestionDTO;
+import com.credit_card_bill_tracker.backend.billpayment.DeferredBill;
+import com.credit_card_bill_tracker.backend.billpayment.DeferredBillMapper;
+import com.credit_card_bill_tracker.backend.billpayment.DeferredBillRepository;
+import com.credit_card_bill_tracker.backend.billpayment.OptimizationStrategy;
 import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
+import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.user.User;
 import com.credit_card_bill_tracker.backend.billingcycle.BillingCycleRequestDTO;
@@ -21,7 +27,6 @@ public class BillingCycleService {
 
     private final BillingCycleRepository repository;
     private final BillingCycleMapper billingCycleMapper;
-    private final BillPaymentRepository billPaymentRepo;
     private final DeferredBillRepository deferredBillRepo;
     private final DeferredBillMapper deferredBillMapper;
     private final BillOptimizerService billOptimizerService;
@@ -30,6 +35,12 @@ public class BillingCycleService {
         return repository.findByUserId(user.getId()).stream()
                 .map(billingCycleMapper::toResponseDTO)
                 .toList();
+    }
+
+    public BillingCycleResponseDTO getLatest(User user) {
+        BillingCycle latest = repository.findFirstByUserIdOrderByUpdatedAtDesc(user.getId());
+        if (latest == null) return null;
+        return billingCycleMapper.toResponseDTO(latest);
     }
 
     public BillingCycleResponseDTO getById(User user, UUID id) {
@@ -41,6 +52,10 @@ public class BillingCycleService {
 
     @Transactional
     public BillingCycleResponseDTO create(User user, BillingCycleRequestDTO dto) {
+        if (repository.existsByUserIdAndLabel(user.getId(), dto.getLabel()) ||
+                repository.existsByUserIdAndMonth(user.getId(), dto.getMonth())) {
+            throw new BadRequestException("Billing cycle with that month or label already exists");
+        }
         BillingCycle entity = billingCycleMapper.toEntity(dto, user);
         BillingCycle savedCycle = repository.save(entity);
 
@@ -79,13 +94,24 @@ public class BillingCycleService {
         BillingCycle cycle = repository.findById(id)
                 .filter(c -> c.getUser().getId().equals(user.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Billing cycle not found"));
+        if (repository.existsByUserIdAndLabelAndIdNot(user.getId(), dto.getLabel(), id) ||
+                repository.existsByUserIdAndMonthAndIdNot(user.getId(), dto.getMonth(), id)) {
+            throw new BadRequestException("Billing cycle with that month or label already exists");
+        }
         billingCycleMapper.updateEntity(cycle, dto);
-        List<BillPayment> payments = dto.getBillPaymentIds().stream()
-                .map(billPaymentRepo::findById)
-                .map(optional -> optional.orElseThrow(() -> new ResourceNotFoundException("Bill payment not found")))
-                .toList();
-        cycle.setBillPayments(payments);
         return billingCycleMapper.toResponseDTO(repository.save(cycle));
+    }
+
+    @Transactional
+    public BillingCycleResponseDTO complete(User user, UUID id) {
+        BillingCycle cycle = repository.findById(id)
+                .filter(c -> c.getUser().getId().equals(user.getId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Billing cycle not found"));
+        if (cycle.getCompletedDate() == null) {
+            cycle.setCompletedDate(LocalDate.now());
+            repository.save(cycle);
+        }
+        return billingCycleMapper.toResponseDTO(cycle);
     }
 
     @Transactional

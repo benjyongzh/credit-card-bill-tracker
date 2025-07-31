@@ -2,6 +2,7 @@ package com.credit_card_bill_tracker.backend.expense;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
 import com.credit_card_bill_tracker.backend.common.BaseEntity;
+import com.credit_card_bill_tracker.backend.billingcycle.BillingCycle;
 import com.credit_card_bill_tracker.backend.creditcard.CreditCard;
 import com.credit_card_bill_tracker.backend.user.User;
 import jakarta.persistence.*;
@@ -41,4 +42,7 @@ public class Expense extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "bank_account_id")
     )
     private List<BankAccount> bankAccounts;
+
+    @ManyToOne(optional = false)
+    private BillingCycle billingCycle;
 }

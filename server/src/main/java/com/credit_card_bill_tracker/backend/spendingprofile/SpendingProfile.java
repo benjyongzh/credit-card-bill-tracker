@@ -11,7 +11,10 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "spending_profiles")
+@Table(
+        name = "spending_profiles",
+        uniqueConstraints = @UniqueConstraint(name = "uk_profile_user_name", columnNames = {"user_id", "name"})
+)
 @Getter
 @Setter
 @NoArgsConstructor

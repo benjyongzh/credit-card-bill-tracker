@@ -13,5 +13,5 @@ public class BillPaymentResponseDTO {
     private UUID toAccountId;
     private double amount;
     private LocalDate date;
-    private boolean completed;
+    private UUID billingCycleId;
 }

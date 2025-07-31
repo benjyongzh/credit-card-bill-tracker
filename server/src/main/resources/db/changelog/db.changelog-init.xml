@@ -82,13 +82,16 @@
             <column name="label" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="completed_date" type="date">
+            <column name="month" type="varchar(20)">
                 <constraints nullable="false"/>
             </column>
+            <column name="completed_date" type="date"/>
             <column name="created_at" type="timestamp"/>
             <column name="updated_at" type="timestamp"/>
             <column name="deleted_at" type="timestamp"/>
         </createTable>
+        <addUniqueConstraint tableName="billing_cycles" columnNames="user_id,label" constraintName="uk_cycle_user_label"/>
+        <addUniqueConstraint tableName="billing_cycles" columnNames="user_id,month" constraintName="uk_cycle_user_month"/>
 
         <!-- Bill Payments table -->
         <createTable tableName="bill_payment">
@@ -111,8 +114,8 @@
                 <constraints nullable="false"/>
             </column>
             <column name="date" type="date"/>
-            <column name="completed" type="boolean">
-                <constraints nullable="false"/>
+            <column name="billing_cycle_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_bill_payment_cycle" references="billing_cycles(id)"/>
             </column>
             <column name="created_at" type="timestamp"/>
             <column name="updated_at" type="timestamp"/>
@@ -164,6 +167,9 @@
             <column name="amount" type="decimal(19,2)">
                 <constraints nullable="false"/>
             </column>
+            <column name="billing_cycle_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_expense_billing_cycle" references="billing_cycles(id)"/>
+            </column>
             <column name="description" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
@@ -183,16 +189,6 @@
         </createTable>
         <addPrimaryKey tableName="expense_bank_accounts" columnNames="expense_id, bank_account_id"/>
 
-        <!-- Billing Cycle Payments junction table -->
-        <createTable tableName="billing_cycle_payments">
-            <column name="billing_cycle_id" type="uuid">
-                <constraints nullable="false" foreignKeyName="fk_billing_cycle_payments_billing_cycle" references="billing_cycles(id)"/>
-            </column>
-            <column name="bill_payment_id" type="uuid">
-                <constraints nullable="false" foreignKeyName="fk_billing_cycle_payments_bill_payment" references="bill_payment(id)"/>
-            </column>
-        </createTable>
-        <addPrimaryKey tableName="billing_cycle_payments" columnNames="billing_cycle_id, bill_payment_id"/>
 
         <!-- Expense Summaries table -->
         <createTable tableName="expense_summaries">
@@ -238,6 +234,7 @@
             <column name="updated_at" type="timestamp"/>
             <column name="deleted_at" type="timestamp"/>
         </createTable>
+        <addUniqueConstraint tableName="spending_profiles" columnNames="user_id,name" constraintName="uk_profile_user_name"/>
 
         <!-- Spending Profile Bank Accounts junction table -->
         <createTable tableName="spending_profile_bank_accounts">

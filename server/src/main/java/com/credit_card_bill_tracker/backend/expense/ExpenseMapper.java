@@ -1,14 +1,20 @@
 package com.credit_card_bill_tracker.backend.expense;
 
 import com.credit_card_bill_tracker.backend.bankaccount.BankAccount;
+import com.credit_card_bill_tracker.backend.billingcycle.BillingCycleRepository;
 import com.credit_card_bill_tracker.backend.expense.ExpenseRequestDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class ExpenseMapper {
+
+    private final BillingCycleRepository billingCycleRepository;
 
     public ExpenseRequestDTO toDto(Expense entity) {
         ExpenseRequestDTO dto = new ExpenseRequestDTO();
@@ -19,6 +25,7 @@ public class ExpenseMapper {
         dto.setBankAccountIds(entity.getBankAccounts().stream()
                 .map(BankAccount::getId)
                 .collect(Collectors.toList()));
+        dto.setBillingCycleId(entity.getBillingCycle().getId());
         return dto;
     }
 
@@ -33,6 +40,7 @@ public class ExpenseMapper {
         dto.setBankAccountIds(entity.getBankAccounts().stream()
                 .map(BankAccount::getId)
                 .collect(Collectors.toList()));
+        dto.setBillingCycleId(entity.getBillingCycle().getId());
         return dto;
     }
 
@@ -41,6 +49,7 @@ public class ExpenseMapper {
         entity.setDate(dto.getDate());
         entity.setAmount(dto.getAmount());
         entity.setDescription(dto.getDescription());
+        entity.setBillingCycle(billingCycleRepository.getReferenceById(dto.getBillingCycleId()));
         return entity;
     }
 
@@ -48,5 +57,6 @@ public class ExpenseMapper {
         entity.setDate(dto.getDate());
         entity.setAmount(dto.getAmount());
         entity.setDescription(dto.getDescription());
+        entity.setBillingCycle(billingCycleRepository.getReferenceById(dto.getBillingCycleId()));
     }
 }
