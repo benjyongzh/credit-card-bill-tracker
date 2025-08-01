@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface BillPaymentRepository extends BaseRepository<BillPayment, UUID> {
     List<BillPayment> findByUserId(UUID userId);
+    List<BillPayment> findByUserIdAndBillingCycleId(UUID userId, UUID billingCycleId);
 }

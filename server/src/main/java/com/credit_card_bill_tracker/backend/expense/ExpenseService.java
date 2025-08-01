@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import jakarta.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +29,12 @@ public class ExpenseService {
     private final SpendingProfileRepository spendingProfileRepo;
     private final ExpenseSummaryService summaryService;
 
-    public List<ExpenseResponseDTO> getAll(User user, UUID cardId) {
-        if (cardId != null) {
+    public List<ExpenseResponseDTO> getAll(User user, UUID cardId, UUID billingCycleId) {
+        if (billingCycleId != null) {
+            return repository.findByUserIdAndBillingCycleId(user.getId(), billingCycleId).stream()
+                    .map(mapper::toResponseDto)
+                    .toList();
+        } else if (cardId != null) {
             return repository.findByUserIdAndCreditCardId(user.getId(), cardId).stream()
                     .map(mapper::toResponseDto)
                     .toList();
@@ -89,6 +94,16 @@ public class ExpenseService {
         summaryService.updateFromExpense(user, saved, true); // apply new
 
         return mapper.toResponseDto(saved);
+    }
+
+    @Transactional
+    public List<ExpenseResponseDTO> updateMany(User user, List<ExpenseRequestDTO> dtos) {
+        List<ExpenseResponseDTO> result = new ArrayList<>();
+        for (ExpenseRequestDTO dto : dtos) {
+            if (dto.getId() == null) continue;
+            result.add(update(user, dto.getId(), dto));
+        }
+        return result;
     }
 
     public void delete(User user, UUID id) {
