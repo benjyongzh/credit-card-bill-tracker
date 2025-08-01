@@ -41,6 +41,15 @@
             <column name="default_card_id" value="44444444-4444-4444-4444-444444444444"/>
         </insert>
 
+        <!-- Billing cycle for the sample data -->
+        <insert tableName="billing_cycles">
+            <column name="id" value="77777777-7777-7777-7777-777777777777"/>
+            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="label" value="January 2024"/>
+            <column name="month" value="JANUARY"/>
+            <column name="completed_date" valueDate="2024-01-31"/>
+        </insert>
+
         <!-- Sample expense paid with the demo card -->
         <insert tableName="expenses">
             <column name="id" value="88888888-8888-8888-8888-888888888888"/>
@@ -149,14 +158,6 @@
             <column name="billing_cycle_id" value="77777777-7777-7777-7777-777777777777"/>
         </insert>
 
-        <!-- Billing cycle with the payment -->
-        <insert tableName="billing_cycles">
-            <column name="id" value="77777777-7777-7777-7777-777777777777"/>
-            <column name="user_id" value="11111111-1111-1111-1111-111111111111"/>
-            <column name="label" value="January 2024"/>
-            <column name="month" value="JANUARY"/>
-            <column name="completed_date" valueDate="2024-01-31"/>
-        </insert>
 
 
         <!-- Expense summary record -->
