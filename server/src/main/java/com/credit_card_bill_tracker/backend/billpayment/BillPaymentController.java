@@ -22,8 +22,10 @@ public class BillPaymentController {
 
     @Operation(summary = "Get bill payments", description = "Returns a list of scheduled bill payments")
     @GetMapping
-    public ResponseEntity<List<BillPaymentResponseDTO>> getAll(@AuthenticationPrincipal User user) {
-        List<BillPaymentResponseDTO> result = service.getAll(user);
+    public ResponseEntity<List<BillPaymentResponseDTO>> getAll(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) UUID billingCycleId) {
+        List<BillPaymentResponseDTO> result = service.getAll(user, billingCycleId);
         return ResponseEntity.ok(result);
     }
 
@@ -38,6 +40,15 @@ public class BillPaymentController {
     @PutMapping("/{id}")
     public ResponseEntity<BillPaymentResponseDTO> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @Valid @RequestBody BillPaymentRequestDTO dto) {
         BillPaymentResponseDTO result = service.update(user, id, dto);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
+    }
+
+    @Operation(summary = "Update multiple bill payments", description = "Bulk update bill payments")
+    @PutMapping
+    public ResponseEntity<List<BillPaymentResponseDTO>> updateMany(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody List<BillPaymentRequestDTO> dtos) {
+        List<BillPaymentResponseDTO> result = service.updateMany(user, dtos);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
     }
 

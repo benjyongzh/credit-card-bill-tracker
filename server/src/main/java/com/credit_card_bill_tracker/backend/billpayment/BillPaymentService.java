@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
+import jakarta.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +20,12 @@ public class BillPaymentService {
     private final BillPaymentMapper billPaymentMapper;
     private final ExpenseSummaryService summaryService;
 
-    public List<BillPaymentResponseDTO> getAll(User user) {
+    public List<BillPaymentResponseDTO> getAll(User user, UUID billingCycleId) {
+        if (billingCycleId != null) {
+            return billPaymentRepository.findByUserIdAndBillingCycleId(user.getId(), billingCycleId).stream()
+                    .map(billPaymentMapper::toResponseDto)
+                    .toList();
+        }
         return billPaymentRepository.findByUserId(user.getId()).stream()
                 .map(billPaymentMapper::toResponseDto)
                 .toList();
@@ -60,6 +67,16 @@ public class BillPaymentService {
         summaryService.updateFromBillPayment(user, entity, false);
         entity.softDelete();
         billPaymentRepository.save(entity);
+    }
+
+    @Transactional
+    public List<BillPaymentResponseDTO> updateMany(User user, List<BillPaymentRequestDTO> dtos) {
+        List<BillPaymentResponseDTO> result = new ArrayList<>();
+        for (BillPaymentRequestDTO dto : dtos) {
+            if (dto.getId() == null) continue;
+            result.add(update(user, dto.getId(), dto));
+        }
+        return result;
     }
 
 }
