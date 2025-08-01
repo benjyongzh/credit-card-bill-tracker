@@ -22,8 +22,11 @@ public class ExpenseController {
 
     @Operation(summary = "Get expenses", description = "Returns expenses for the user, optionally filtered by credit card")
     @GetMapping
-    public ResponseEntity<List<ExpenseResponseDTO>> get(@AuthenticationPrincipal User user, @RequestParam(required = false) UUID cardId) {
-        List<ExpenseResponseDTO> result = service.getAll(user, cardId);
+    public ResponseEntity<List<ExpenseResponseDTO>> get(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) UUID cardId,
+            @RequestParam(required = false) UUID billingCycleId) {
+        List<ExpenseResponseDTO> result = service.getAll(user, cardId, billingCycleId);
         return ResponseEntity.ok(result);
     }
 
@@ -49,6 +52,14 @@ public class ExpenseController {
     @PutMapping("/{id}")
     public ResponseEntity<ExpenseResponseDTO> update(@AuthenticationPrincipal User user, @PathVariable UUID id, @Valid @RequestBody ExpenseRequestDTO dto) {
         ExpenseResponseDTO result = service.update(user, id, dto);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
+    }
+
+    @Operation(summary = "Update multiple expenses", description = "Bulk update expenses")
+    @PutMapping
+    public ResponseEntity<List<ExpenseResponseDTO>> updateMany(@AuthenticationPrincipal User user,
+                                            @Valid @RequestBody List<ExpenseRequestDTO> dtos) {
+        List<ExpenseResponseDTO> result = service.updateMany(user, dtos);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
     }
 

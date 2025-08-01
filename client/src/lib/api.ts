@@ -56,11 +56,12 @@ export const spendingProfileApi = {
 
 // -------- Expenses --------
 export const expenseApi = {
-  getAll: (cardId?: string) =>
-    api.get('/expenses', { params: { cardId } }),
+  getAll: (cardId?: string, billingCycleId?: string) =>
+    api.get('/expenses', { params: { cardId, billingCycleId } }),
   create: (payload: unknown, spendingProfileId: string) =>
     api.post('/expenses', payload, { params: { spendingProfileId } }),
   update: (id: string, payload: unknown) => api.put(`/expenses/${id}`, payload),
+  updateMany: (payload: unknown[]) => api.put('/expenses', payload),
   remove: (id: string) => api.delete(`/expenses/${id}`),
 }
 
@@ -79,9 +80,11 @@ export const billingCycleApi = {
 
 // -------- Bill Payments --------
 export const billPaymentApi = {
-  getAll: () => api.get('/bills'),
+  getAll: (billingCycleId?: string) =>
+    api.get('/bills', { params: { billingCycleId } }),
   create: (payload: unknown) => api.post('/bills', payload),
   update: (id: string, payload: unknown) => api.put(`/bills/${id}`, payload),
+  updateMany: (payload: unknown[]) => api.put('/bills', payload),
   remove: (id: string) => api.delete(`/bills/${id}`),
 }
 

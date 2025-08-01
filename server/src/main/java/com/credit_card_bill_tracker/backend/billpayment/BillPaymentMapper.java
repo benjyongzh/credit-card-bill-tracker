@@ -16,6 +16,7 @@ public class BillPaymentMapper {
 
     public BillPaymentRequestDTO toDto(BillPayment entity) {
         BillPaymentRequestDTO dto = new BillPaymentRequestDTO();
+        dto.setId(entity.getId());
         dto.setAmount(entity.getAmount());
         dto.setDate(entity.getDate());
         dto.setFromAccountId(entity.getFromAccount().getId());

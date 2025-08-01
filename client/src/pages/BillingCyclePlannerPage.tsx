@@ -16,18 +16,32 @@ import ProfileSection from '@/components/ProfileSection'
 import BillPaymentSection from '@/components/BillPaymentSection'
 import { useProfiles } from '@/hooks/useProfiles'
 
+interface PaymentRow {
+  id: string
+  serverId?: string
+  fromAccount: string
+  toCard: string
+  amount: number
+  dirty?: boolean
+}
+
 export default function BillingCyclePlannerPage() {
   const {
     profiles,
   } = useProfiles()
 
   const [saving, setSaving] = useState(false)
+  const [deletedExpenses, setDeletedExpenses] = useState<string[]>([])
+  const [billPayments, setBillPayments] = useState<PaymentRow[]>([])
+  const [deletedPayments, setDeletedPayments] = useState<string[]>([])
   const [suggestions, setSuggestions] = useState<any[]>([])
   const [currentCycle, setCurrentCycle] = useState<BillingCycle | null>(null)
   const [cycles, setCycles] = useState<BillingCycle[]>([])
   const [accounts, setAccounts] = useState<BankAccount[]>([])
   const [cards, setCards] = useState<Card[]>([])
   const [createOpen, setCreateOpen] = useState(false)
+  const [profileSelect, setProfileSelect] = useState('')
+  const [profileToDelete, setProfileToDelete] = useState<ProfileRow | null>(null)
   const [labelInput, setLabelInput] = useState('')
   const [monthInput, setMonthInput] = useState(dayjs().format('MMMM').toUpperCase())
 
@@ -88,12 +102,20 @@ export default function BillingCyclePlannerPage() {
       accountMap[a.name] = a.id
     })
 
-    const promises: Promise<any>[] = []
+    const creates: { promise: Promise<any>; profileId: string; rowId: string }[] = []
+    const updates: any[] = []
+    const deletes = [...deletedExpenses]
+
+    const bpCreates: { promise: Promise<any>; rowId: string }[] = []
+    const bpUpdates: any[] = []
+    const bpDeletes = [...deletedPayments]
+
     profiles.forEach((p) => {
       p.subRows.forEach((e) => {
         const accId = accountMap[e.account]
         if (!accId || !cards[0]) return
         const payload = {
+          id: e.serverId,
           creditCardId: cards[0].id,
           date: dayjs().format('YYYY-MM-DD'),
           amount: e.amount,
@@ -101,12 +123,92 @@ export default function BillingCyclePlannerPage() {
           bankAccountIds: [accId],
           billingCycleId: currentCycle.id,
         }
-        promises.push(expenseApi.create(payload, p.id))
+        if (!e.serverId) {
+          creates.push({
+            profileId: p.id,
+            rowId: e.id,
+            promise: expenseApi.create(payload, p.id),
+          })
+        } else if (e.dirty) {
+          updates.push(payload)
+        }
       })
     })
 
+    billPayments.forEach((bp) => {
+      if (!cards[0]) return
+      const payload = {
+        id: bp.serverId,
+        fromAccountId: bp.fromAccount,
+        toCardId: bp.toCard,
+        toAccountId: null,
+        date: dayjs().format('YYYY-MM-DD'),
+        amount: bp.amount,
+        billingCycleId: currentCycle.id,
+      }
+      if (!bp.serverId) {
+        bpCreates.push({ rowId: bp.id, promise: billPaymentApi.create(payload) })
+      } else if (bp.dirty) {
+        bpUpdates.push(payload)
+      }
+    })
+
     try {
-      await Promise.all(promises)
+      if (deletes.length) {
+        await Promise.all(deletes.map((id) => expenseApi.remove(id)))
+        setDeletedExpenses([])
+      }
+      if (updates.length) {
+        await expenseApi.updateMany(updates)
+      }
+      if (bpDeletes.length) {
+        await Promise.all(bpDeletes.map((id) => billPaymentApi.remove(id)))
+        setDeletedPayments([])
+      }
+      if (bpUpdates.length) {
+        await billPaymentApi.updateMany(bpUpdates)
+      }
+      await Promise.all(
+        creates.map((c) =>
+          c.promise.then((res) => ({ ...c, id: res.data.id as string })),
+        ),
+      ).then((results) => {
+        setProfiles((prev) =>
+          prev.map((p) => ({
+            ...p,
+            subRows: p.subRows.map((r) => {
+              const match = results.find(
+                (res) => res.profileId === p.id && res.rowId === r.id,
+              )
+              if (match) {
+                return { ...r, serverId: match.id, dirty: false }
+              }
+              if (r.serverId && updates.some((u) => u.id === r.serverId)) {
+                return { ...r, dirty: false }
+              }
+              return r
+            }),
+          }))
+        )
+      })
+      await Promise.all(
+        bpCreates.map((c) =>
+          c.promise.then((res) => ({ ...c, id: res.data.id as string })),
+        ),
+      ).then((results) => {
+        setBillPayments((prev) =>
+          prev.map((r) => {
+            const match = results.find((res) => res.rowId === r.id)
+            if (match) {
+              return { ...r, serverId: match.id, dirty: false }
+            }
+            if (r.serverId && bpUpdates.some((u) => u.id === r.serverId)) {
+              return { ...r, dirty: false }
+            }
+            return r
+          }),
+        )
+      })
     } catch {
       /* ignore */
     } finally {
@@ -174,7 +276,6 @@ export default function BillingCyclePlannerPage() {
         <Modal
           title="Create new billing cycle?"
           triggerLabel="New Billing Cycle"
-          triggerClassName=""
           onOpen={() => setCreateOpen(true)}
         >
           {cycles.some((c) => c.month === dayjs().format('MMMM').toUpperCase()) && (
@@ -246,6 +347,26 @@ export default function BillingCyclePlannerPage() {
           Complete Bill Payments
         </Button>
       </div>
+      <Modal
+        title="Delete category?"
+        open={!!profileToDelete}
+        onOpenChange={(o) => !o && setProfileToDelete(null)}
+      >
+        <p className="mb-4 text-foreground">
+          This will also remove all expenses under {profileToDelete?.name}.
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (profileToDelete) removeProfile(profileToDelete)
+              setProfileToDelete(null)
+            }}
+          >
+            Confirm
+          </Button>
+        </div>
+      </Modal>
     </div>
   )
 }

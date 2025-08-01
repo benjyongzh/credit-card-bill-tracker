@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button'
 
 interface ModalProps {
   title: string
-  triggerLabel: string
+  triggerLabel?: string
   children: ReactNode
   triggerClassName?: string
   contentClassName?: string
   onOpen?: () => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export default function Modal({
@@ -18,12 +20,16 @@ export default function Modal({
   triggerClassName,
   contentClassName,
   onOpen,
+  open,
+  onOpenChange,
 }: ModalProps) {
   return (
-    <Dialog>
-      <DialogTrigger asChild={true} onClick={onOpen}>
-        <Button className={triggerClassName}>{triggerLabel}</Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {triggerLabel && (
+        <DialogTrigger asChild onClick={onOpen}>
+          <Button className={triggerClassName}>{triggerLabel}</Button>
+        </DialogTrigger>
+      )}
       <DialogContent className={`bg-background/90 dark:bg-primary/40 backdrop-blur-xl dark:backdrop-blur ${contentClassName}`}>
         <DialogTitle className="text-foreground mb-4">{title}</DialogTitle>
         {children}
