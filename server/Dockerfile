@@ -1,14 +1,14 @@
-# Use a Maven image with Java 17+
-FROM maven:3.9-eclipse-temurin-17 as builder
+# Use Maven with Java 21
+FROM maven:3.9-eclipse-temurin-21 as builder
 
-# Set working directory
-WORKDIR /workspace/server
+# Set working directory inside container
+WORKDIR /app
 
-# Copy only the server folder (Spring Boot app)
-COPY server /workspace/server
+# Copy current directory contents into container (just /server)
+COPY . .
 
-# Download dependencies ahead of time
+# Preload dependencies for offline use
 RUN mvn dependency:go-offline
 
-# Run tests
+# Default command: run tests
 CMD ["mvn", "test", "-q"]
