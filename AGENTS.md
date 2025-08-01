@@ -1,4 +1,4 @@
-# AGENTS.md
+# AGENTS.md – Spring Boot Test Runner
 
 ## Overview
 
@@ -20,6 +20,7 @@ AI agents working in this workspace are expected to run unit and integration tes
 │   ├── .mvn/           # Maven wrapper folder (must be included)
 │   ├── mvnw            # Maven wrapper shell script (must be executable)
 │   ├── mvnw.cmd        # Maven wrapper for Windows (optional)
+│   ├── Dockerfile      # For testing environment for agents
 └── AGENTS.md           # This file
 ```
 
@@ -113,51 +114,31 @@ cd server
 ./mvnw dependency:go-offline
 ```
 
-### 2. Run tests
+---
+
+### 2. Running Tests in Docker (Backend Only)
+
+To run backend tests in an offline-compatible container (recommended when Maven wrapper fails):
 
 ```bash
-cd server
-./mvnw test
+docker build -t backend-tester -f server/Dockerfile .
+docker run --rm backend-tester
 ```
+
+This uses a system-installed version of Maven (not `./mvnw`) and is suitable for agents in network-restricted environments.
+Ensure the Dockerfile contains an offline-ready `mvn dependency:go-offline` instruction during build time.
 
 ---
 
-## Best Practices
+## ✅ Summary for Agents
 
-- Always commit the full Maven wrapper: `.mvn/`, `mvnw`, `mvnw.cmd`
-- Avoid relying on remote parent POMs or snapshots during testing
-- Avoid modifying `pom.xml` unless instructed
+To execute backend tests reliably:
 
----
-
-## Optional: Docker Testing Environment
-
-If a consistent test environment is desired, define the following `Dockerfile`:
-
-```Dockerfile
-FROM maven:3.9-eclipse-temurin-17
-WORKDIR /app
-COPY server ./server
-WORKDIR /app/server
-RUN mvn dependency:go-offline
-CMD ["mvn", "test"]
-```
-
-Build and test:
-
-```bash
-docker build -t springboot-tester .
-docker run --rm springboot-tester
-```
-
----
-
-## Summary
-
-This `AGENTS.md` ensures any capable AI agent can:
-
-- Understand the backend project location
-- Resolve Maven dependencies (or know how to prepare them)
-- Execute tests using `./mvnw test` reliably
-
-Agents should treat this file as canonical test instructions.
+- Prefer running `./mvnw dependency:go-offline` before `./mvnw test`
+- If Maven wrapper fails due to missing distribution or network issues, fall back to:
+  ```bash
+  docker build -t backend-tester -f server/Dockerfile .
+  docker run --rm backend-tester
+  ```
+- Agents should not attempt to download new dependencies during test execution
+- Maven dependencies and plugins must be available beforehand
