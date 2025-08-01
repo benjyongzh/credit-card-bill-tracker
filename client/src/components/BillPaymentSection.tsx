@@ -1,10 +1,7 @@
 import { useMemo } from 'react'
 import dayjs from 'dayjs'
-import {
-  ColumnDef,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import EditableTable from './EditableTable'
 import { Button } from './ui/button'
 import { useBillPayments } from '@/hooks/useBillPayments'

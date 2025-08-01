@@ -8,6 +8,8 @@ export interface ExpenseRow {
   description: string
   account: string
   profileId: string
+  serverId?: string
+  dirty?: boolean
 }
 
 export interface ProfileRow {
@@ -52,6 +54,7 @@ export function useProfiles() {
                   description: '',
                   account: p.bankAccounts[0] || '',
                   profileId,
+                  dirty: true,
                 },
               ],
             }
@@ -65,7 +68,12 @@ export function useProfiles() {
     setProfiles((prev) =>
       prev.map((p) =>
         p.subRows.includes(expense)
-          ? { ...p, subRows: p.subRows.map((s) => (s === expense ? { ...s, ...changes } : s)) }
+          ? {
+              ...p,
+              subRows: p.subRows.map((s) =>
+                s === expense ? { ...s, ...changes, dirty: true } : s,
+              ),
+            }
           : p,
       ),
     )
@@ -77,5 +85,5 @@ export function useProfiles() {
     return Array.from(set)
   }, [profiles])
 
-  return { profiles, expanded, setExpanded, addExpense, updateExpense, allAccounts }
+  return { profiles, setProfiles, expanded, setExpanded, addExpense, updateExpense, allAccounts }
 }

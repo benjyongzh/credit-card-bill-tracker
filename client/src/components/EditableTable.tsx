@@ -1,6 +1,7 @@
-import { flexRender, Row, Table as ReactTable } from '@tanstack/react-table'
+import { flexRender } from '@tanstack/react-table'
+import type { Row, Table as ReactTable } from '@tanstack/react-table'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 interface Props<T> {
   table: ReactTable<T>

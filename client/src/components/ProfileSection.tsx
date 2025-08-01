@@ -1,14 +1,11 @@
 import { useMemo } from 'react'
 import { formatNumber } from 'accounting-js'
-import {
-  ColumnDef,
-  getCoreRowModel,
-  getExpandedRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
+import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table'
 import EditableTable from './EditableTable'
 import { Button } from './ui/button'
-import { ProfileRow, ExpenseRow, useProfiles } from '@/hooks/useProfiles'
+import type { ProfileRow, ExpenseRow } from '@/hooks/useProfiles'
+import { useProfiles } from '@/hooks/useProfiles'
 
 export default function ProfileSection() {
   const { profiles, expanded, setExpanded, addExpense, updateExpense, allAccounts } = useProfiles()
@@ -23,7 +20,7 @@ export default function ProfileSection() {
           const total = row.original.subRows
             .filter((e) => e.account === acc)
             .reduce((sum, e) => sum + e.amount, 0)
-          return total ? formatNumber(total, 2) : ''
+          return total ? formatNumber(total, { precision: 2 }) : ''
         },
       }))
 
@@ -60,7 +57,7 @@ export default function ProfileSection() {
           cell: ({ row }) => {
             if (row.depth !== 0) return null
             const total = row.original.subRows.reduce((sum, e) => sum + e.amount, 0)
-            return formatNumber(total, 2)
+            return formatNumber(total, { precision: 2 })
           },
         },
         {
@@ -68,7 +65,7 @@ export default function ProfileSection() {
           header: 'Amount',
           cell: ({ row }) => {
             if (!row.depth) return null
-            const expense = row.original as ExpenseRow
+            const expense = row.original as unknown as ExpenseRow
             const profile = profiles.find((p) => p.id === expense.profileId)
             return (
               <div className="flex gap-2 items-center">
@@ -98,7 +95,7 @@ export default function ProfileSection() {
           header: 'Description',
           cell: ({ row }) => {
             if (!row.depth) return null
-            const expense = row.original as ExpenseRow
+            const expense = row.original as unknown as ExpenseRow
             return (
               <input
                 type="text"
@@ -119,9 +116,9 @@ export default function ProfileSection() {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    getSubRows: (row) => row.subRows,
+    getSubRows: (row) => row.subRows as unknown as ProfileRow[],
     state: { expanded },
-    onExpandedChange: setExpanded,
+    onExpandedChange: setExpanded as any,
   })
 
   return (
