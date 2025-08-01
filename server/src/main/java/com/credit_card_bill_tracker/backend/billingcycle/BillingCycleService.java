@@ -7,6 +7,7 @@ import com.credit_card_bill_tracker.backend.billpayment.DeferredBill;
 import com.credit_card_bill_tracker.backend.billpayment.DeferredBillMapper;
 import com.credit_card_bill_tracker.backend.billpayment.DeferredBillRepository;
 import com.credit_card_bill_tracker.backend.billpayment.OptimizationStrategy;
+import com.credit_card_bill_tracker.backend.billpayment.DeferredBillResponseDTO;
 import com.credit_card_bill_tracker.backend.expensesummary.TargetType;
 import com.credit_card_bill_tracker.backend.common.errors.ResourceNotFoundException;
 import com.credit_card_bill_tracker.backend.common.errors.BadRequestException;
