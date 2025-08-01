@@ -48,6 +48,13 @@
             <column name="updated_at" type="timestamp"/>
             <column name="deleted_at" type="timestamp"/>
         </createTable>
+        <createIndex tableName="bank_accounts" indexName="idx_bank_accounts_user">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex tableName="bank_accounts" indexName="idx_bank_accounts_user_default">
+            <column name="user_id"/>
+            <column name="is_default"/>
+        </createIndex>
 
         <!-- Credit Cards table -->
         <createTable tableName="credit_cards">
@@ -65,6 +72,9 @@
             <column name="updated_at" type="timestamp"/>
             <column name="deleted_at" type="timestamp"/>
         </createTable>
+        <createIndex tableName="credit_cards" indexName="idx_credit_cards_user">
+            <column name="user_id"/>
+        </createIndex>
 
         <!-- Add foreign key for default_card_id in bank_accounts -->
         <addForeignKeyConstraint baseTableName="bank_accounts" baseColumnNames="default_card_id"
@@ -92,6 +102,13 @@
         </createTable>
         <addUniqueConstraint tableName="billing_cycles" columnNames="user_id,label" constraintName="uk_cycle_user_label"/>
         <addUniqueConstraint tableName="billing_cycles" columnNames="user_id,month" constraintName="uk_cycle_user_month"/>
+        <createIndex tableName="billing_cycles" indexName="idx_billing_cycles_user">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex tableName="billing_cycles" indexName="idx_billing_cycles_user_updated">
+            <column name="user_id"/>
+            <column name="updated_at"/>
+        </createIndex>
 
         <!-- Bill Payments table -->
         <createTable tableName="bill_payment">
@@ -121,6 +138,13 @@
             <column name="updated_at" type="timestamp"/>
             <column name="deleted_at" type="timestamp"/>
         </createTable>
+        <createIndex tableName="bill_payment" indexName="idx_bill_payment_user">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex tableName="bill_payment" indexName="idx_bill_payment_user_cycle">
+            <column name="user_id"/>
+            <column name="billing_cycle_id"/>
+        </createIndex>
 
         <!-- Deferred Bills table -->
         <createTable tableName="deferred_bill">
@@ -149,6 +173,10 @@
             <column name="updated_at" type="timestamp"/>
             <column name="deleted_at" type="timestamp"/>
         </createTable>
+        <createIndex tableName="deferred_bill" indexName="idx_deferred_bill_user_cycle">
+            <column name="user_id"/>
+            <column name="billing_cycle_id"/>
+        </createIndex>
 
         <!-- Expenses table -->
         <createTable tableName="expenses">
@@ -177,6 +205,17 @@
             <column name="updated_at" type="timestamp"/>
             <column name="deleted_at" type="timestamp"/>
         </createTable>
+        <createIndex tableName="expenses" indexName="idx_expenses_user">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex tableName="expenses" indexName="idx_expenses_user_card">
+            <column name="user_id"/>
+            <column name="credit_card_id"/>
+        </createIndex>
+        <createIndex tableName="expenses" indexName="idx_expenses_user_cycle">
+            <column name="user_id"/>
+            <column name="billing_cycle_id"/>
+        </createIndex>
 
         <!-- Expense Bank Accounts junction table -->
         <createTable tableName="expense_bank_accounts">
@@ -218,6 +257,9 @@
             <column name="deleted_at" type="timestamp"/>
         </createTable>
         <addUniqueConstraint tableName="expense_summaries" columnNames="user_id, from_account_id, to_id, to_type" constraintName="uk_expense_summary"/>
+        <createIndex tableName="expense_summaries" indexName="idx_expense_summaries_user">
+            <column name="user_id"/>
+        </createIndex>
 
         <!-- Spending Profiles table -->
         <createTable tableName="spending_profiles">
@@ -235,6 +277,9 @@
             <column name="deleted_at" type="timestamp"/>
         </createTable>
         <addUniqueConstraint tableName="spending_profiles" columnNames="user_id,name" constraintName="uk_profile_user_name"/>
+        <createIndex tableName="spending_profiles" indexName="idx_spending_profiles_user">
+            <column name="user_id"/>
+        </createIndex>
 
         <!-- Spending Profile Bank Accounts junction table -->
         <createTable tableName="spending_profile_bank_accounts">
