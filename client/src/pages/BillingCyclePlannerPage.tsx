@@ -1,12 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { formatNumber } from 'accounting-js'
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getExpandedRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
 import {
   spendingProfileApi,
   billOptimizerApi,
@@ -27,6 +20,7 @@ import { Button } from '@/components/ui/button'
 import Modal from '@/components/Modal'
 import { DialogClose } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { TrashIcon } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -35,13 +29,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import EditableTable from '@/components/EditableTable'
 
 interface ExpenseRow {
   id: string
+  serverId?: string
   amount: number
   description: string
   account: string
   profileId: string
+  dirty?: boolean
 }
 
 interface ProfileRow {
@@ -51,31 +48,39 @@ interface ProfileRow {
   subRows: ExpenseRow[]
 }
 
+interface PaymentRow {
+  id: string
+  serverId?: string
+  fromAccount: string
+  toCard: string
+  amount: number
+  dirty?: boolean
+}
+
 export default function BillingCyclePlannerPage() {
+  const [allProfiles, setAllProfiles] = useState<SpendingProfile[]>([])
   const [profiles, setProfiles] = useState<ProfileRow[]>([])
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [saving, setSaving] = useState(false)
+  const [deletedExpenses, setDeletedExpenses] = useState<string[]>([])
+  const [billPayments, setBillPayments] = useState<PaymentRow[]>([])
+  const [deletedPayments, setDeletedPayments] = useState<string[]>([])
   const [suggestions, setSuggestions] = useState<any[]>([])
   const [currentCycle, setCurrentCycle] = useState<BillingCycle | null>(null)
   const [cycles, setCycles] = useState<BillingCycle[]>([])
   const [accounts, setAccounts] = useState<BankAccount[]>([])
   const [cards, setCards] = useState<Card[]>([])
   const [createOpen, setCreateOpen] = useState(false)
+  const [profileSelect, setProfileSelect] = useState('')
+  const [profileToDelete, setProfileToDelete] = useState<ProfileRow | null>(null)
   const [labelInput, setLabelInput] = useState('')
   const [monthInput, setMonthInput] = useState(dayjs().format('MMMM').toUpperCase())
 
-  // load profiles
+  // initial load
   useEffect(() => {
     spendingProfileApi
       .getAll()
       .then((res) => {
-        const data = (res.data as SpendingProfile[]).map((p) => ({
-          id: p.id,
-          name: p.name,
-          bankAccounts: p.bankAccounts,
-          subRows: [],
-        }))
-        setProfiles(data)
+        setAllProfiles(res.data as SpendingProfile[])
       })
       .catch(() => {
         /* ignore */
@@ -138,12 +143,20 @@ export default function BillingCyclePlannerPage() {
       accountMap[a.name] = a.id
     })
 
-    const promises: Promise<any>[] = []
+    const creates: { promise: Promise<any>; profileId: string; rowId: string }[] = []
+    const updates: any[] = []
+    const deletes = [...deletedExpenses]
+
+    const bpCreates: { promise: Promise<any>; rowId: string }[] = []
+    const bpUpdates: any[] = []
+    const bpDeletes = [...deletedPayments]
+
     profiles.forEach((p) => {
       p.subRows.forEach((e) => {
         const accId = accountMap[e.account]
         if (!accId || !cards[0]) return
         const payload = {
+          id: e.serverId,
           creditCardId: cards[0].id,
           date: dayjs().format('YYYY-MM-DD'),
           amount: e.amount,
@@ -151,12 +164,92 @@ export default function BillingCyclePlannerPage() {
           bankAccountIds: [accId],
           billingCycleId: currentCycle.id,
         }
-        promises.push(expenseApi.create(payload, p.id))
+        if (!e.serverId) {
+          creates.push({
+            profileId: p.id,
+            rowId: e.id,
+            promise: expenseApi.create(payload, p.id),
+          })
+        } else if (e.dirty) {
+          updates.push(payload)
+        }
       })
     })
 
+    billPayments.forEach((bp) => {
+      if (!cards[0]) return
+      const payload = {
+        id: bp.serverId,
+        fromAccountId: bp.fromAccount,
+        toCardId: bp.toCard,
+        toAccountId: null,
+        date: dayjs().format('YYYY-MM-DD'),
+        amount: bp.amount,
+        billingCycleId: currentCycle.id,
+      }
+      if (!bp.serverId) {
+        bpCreates.push({ rowId: bp.id, promise: billPaymentApi.create(payload) })
+      } else if (bp.dirty) {
+        bpUpdates.push(payload)
+      }
+    })
+
     try {
-      await Promise.all(promises)
+      if (deletes.length) {
+        await Promise.all(deletes.map((id) => expenseApi.remove(id)))
+        setDeletedExpenses([])
+      }
+      if (updates.length) {
+        await expenseApi.updateMany(updates)
+      }
+      if (bpDeletes.length) {
+        await Promise.all(bpDeletes.map((id) => billPaymentApi.remove(id)))
+        setDeletedPayments([])
+      }
+      if (bpUpdates.length) {
+        await billPaymentApi.updateMany(bpUpdates)
+      }
+      await Promise.all(
+        creates.map((c) =>
+          c.promise.then((res) => ({ ...c, id: res.data.id as string })),
+        ),
+      ).then((results) => {
+        setProfiles((prev) =>
+          prev.map((p) => ({
+            ...p,
+            subRows: p.subRows.map((r) => {
+              const match = results.find(
+                (res) => res.profileId === p.id && res.rowId === r.id,
+              )
+              if (match) {
+                return { ...r, serverId: match.id, dirty: false }
+              }
+              if (r.serverId && updates.some((u) => u.id === r.serverId)) {
+                return { ...r, dirty: false }
+              }
+              return r
+            }),
+          }))
+        )
+      })
+      await Promise.all(
+        bpCreates.map((c) =>
+          c.promise.then((res) => ({ ...c, id: res.data.id as string })),
+        ),
+      ).then((results) => {
+        setBillPayments((prev) =>
+          prev.map((r) => {
+            const match = results.find((res) => res.rowId === r.id)
+            if (match) {
+              return { ...r, serverId: match.id, dirty: false }
+            }
+            if (r.serverId && bpUpdates.some((u) => u.id === r.serverId)) {
+              return { ...r, dirty: false }
+            }
+            return r
+          }),
+        )
+      })
     } catch {
       /* ignore */
     } finally {
@@ -179,7 +272,7 @@ export default function BillingCyclePlannerPage() {
         setLabelInput(cycle.label)
         setMonthInput(cycle.month)
         setProfiles([])
-        setExpanded({})
+        setBillPayments([])
         setCreateOpen(false)
       })
       .catch(() => {
@@ -219,198 +312,150 @@ export default function BillingCyclePlannerPage() {
     updateCycle({ label: labelInput, month: val })
   }
 
-  const addExpense = (profileId: string) => {
+  const addProfile = (profileId: string) => {
+    const profile = allProfiles.find((p) => p.id === profileId)
+    if (!profile) return
+    setProfiles((prev) => [
+      ...prev,
+      {
+        id: profile.id,
+        name: profile.name,
+        bankAccounts: profile.bankAccounts,
+        subRows: [],
+      },
+    ])
+  }
+
+  const removeProfile = (profile: ProfileRow) => {
+    setProfiles((prev) => prev.filter((p) => p.id !== profile.id))
+    const ids = profile.subRows
+      .filter((e) => e.serverId)
+      .map((e) => e.serverId!)
+    if (ids.length) {
+      setDeletedExpenses((d) => [...d, ...ids])
+    }
+  }
+
+  const deleteProfile = (profile: ProfileRow) => {
+    if (profile.subRows.length) {
+      setProfileToDelete(profile)
+    } else {
+      removeProfile(profile)
+    }
+  }
+
+  const addExpense = (profileId: string, afterId?: string) => {
+    setProfiles((prev) =>
+      prev.map((p) => {
+        if (p.id !== profileId) return p
+        const newRow: ExpenseRow = {
+          id: Math.random().toString(),
+          dirty: true,
+          amount: 0,
+          description: '',
+          account: p.bankAccounts[0] || '',
+          profileId,
+        }
+        if (!afterId) {
+          return { ...p, subRows: [...p.subRows, newRow] }
+        }
+        const idx = p.subRows.findIndex((r) => r.id === afterId)
+        if (idx === -1) {
+          return { ...p, subRows: [...p.subRows, newRow] }
+        }
+        return {
+          ...p,
+          subRows: [
+            ...p.subRows.slice(0, idx + 1),
+            newRow,
+            ...p.subRows.slice(idx + 1),
+          ],
+        }
+      }),
+    )
+  }
+
+  const deleteExpense = (expense: ExpenseRow) => {
     setProfiles((prev) =>
       prev.map((p) =>
-        p.id === profileId
+        p.id === expense.profileId
           ? {
               ...p,
-              subRows: [
-                ...p.subRows,
-                {
-                  id: Math.random().toString(),
-                  amount: 0,
-                  description: '',
-                  account: p.bankAccounts[0] || '',
-                  profileId,
-                },
-              ],
+              subRows: p.subRows.filter((r) => r !== expense),
             }
           : p,
       ),
     )
-    setExpanded((e) => ({ ...e, [profileId]: true }))
+    if (expense.serverId) {
+      setDeletedExpenses((d) => [...d, expense.serverId!])
+    }
   }
 
-  const allAccounts = useMemo(
-    () => {
-      const set = new Set<string>()
-      profiles.forEach((p) => {
-        p.bankAccounts.forEach((a) => set.add(a))
-      })
-      return Array.from(set)
-    },
-    [profiles],
+  const addBillPayment = (afterId?: string) => {
+    const newRow: PaymentRow = {
+      id: Math.random().toString(),
+      fromAccount: accounts[0]?.id || '',
+      toCard: cards[0]?.id || '',
+      amount: 0,
+      dirty: true,
+    }
+    setBillPayments((prev) => {
+      if (!afterId) return [...prev, newRow]
+      const idx = prev.findIndex((p) => p.id === afterId)
+      if (idx === -1) return [...prev, newRow]
+      return [...prev.slice(0, idx + 1), newRow, ...prev.slice(idx + 1)]
+    })
+  }
+
+  const deleteBillPayment = (payment: PaymentRow) => {
+    setBillPayments((prev) => prev.filter((p) => p !== payment))
+    if (payment.serverId) {
+      setDeletedPayments((d) => [...d, payment.serverId!])
+    }
+  }
+  const allAccounts = Array.from(
+    new Set(profiles.flatMap((p) => p.bankAccounts)),
   )
 
-  const columns = useMemo<ColumnDef<ProfileRow>[]>(
-    () => {
-      const accountCols: ColumnDef<ProfileRow>[] = allAccounts.map((acc) => ({
-        id: acc,
-        header: acc,
-        cell: ({ row }) => {
-          if (row.depth !== 0) return null
-          const total = row.original.subRows
-            .filter((e) => e.account === acc)
-            .reduce((sum, e) => sum + e.amount, 0)
-          return total ? formatNumber(total, 2) : ''
-        },
-      }))
-
-      return [
-        {
-          id: 'name',
-          header: 'Category',
-          cell: ({ row }) => {
-            const isExpanded = row.getIsExpanded()
-            return (
-              <div className="flex items-center gap-2">
-                {row.getCanExpand() && (
-                  <button
-                    type="button"
-                    onClick={row.getToggleExpandedHandler()}
-                    className="font-mono"
-                  >
-                    {isExpanded ? '-' : '+'}
-                  </button>
-                )}
-                {row.depth === 0 && (
-                  <span className="font-semibold text-foreground">
-                    {(row.original as ProfileRow).name}
-                  </span>
-                )}
-              </div>
-            )
-          },
-        },
-        ...accountCols,
-        {
-          id: 'total',
-          header: 'Total',
-          cell: ({ row }) => {
-            if (row.depth !== 0) return null
-            const total = row.original.subRows.reduce(
-              (sum, e) => sum + e.amount,
-              0,
-            )
-            return formatNumber(total, 2)
-          },
-        },
-        {
-          id: 'amount',
-          header: 'Amount',
-          cell: ({ row }) => {
-            if (!row.depth) return null
-            const expense = row.original as ExpenseRow
-            const profile = profiles.find((p) => p.id === expense.profileId)
-            return (
-              <div className="flex gap-2 items-center">
-                <select
-                  className="border px-1 text-foreground"
-                  value={expense.account}
-                  onChange={(e) => {
-                    const val = e.target.value
-                    setProfiles((prev) =>
-                      prev.map((p) => {
-                        if (p.subRows.includes(expense)) {
-                          return {
-                            ...p,
-                            subRows: p.subRows.map((s) =>
-                              s === expense ? { ...s, account: val } : s,
-                            ),
-                          }
-                        }
-                        return p
-                      }),
-                    )
-                  }}
-                >
-                  {profile?.bankAccounts.map((a) => (
-                    <option key={a} value={a}>
-                      {a}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  className="w-24 border px-1"
-                  value={expense.amount}
-                  onChange={(e) => {
-                    const val = parseFloat(e.target.value)
-                    setProfiles((prev) =>
-                      prev.map((p) => {
-                        if (p.subRows.includes(expense)) {
-                          return {
-                            ...p,
-                            subRows: p.subRows.map((s) =>
-                              s === expense ? { ...s, amount: val } : s,
-                            ),
-                          }
-                        }
-                        return p
-                      }),
-                    )
-                  }}
-                />
-              </div>
-            )
-          },
-        },
-        {
-          id: 'description',
-          header: 'Description',
-          cell: ({ row }) => {
-            if (!row.depth) return null
-            const expense = row.original as ExpenseRow
-            return (
-              <input
-                type="text"
-                className="w-full border px-1"
-                value={expense.description}
-                onChange={(e) => {
-                  const val = e.target.value
-                  setProfiles((prev) =>
-                    prev.map((p) => {
-                      if (p.subRows.includes(expense)) {
-                        return {
-                          ...p,
-                          subRows: p.subRows.map((s) =>
-                            s === expense ? { ...s, description: val } : s,
-                          ),
-                        }
-                      }
-                      return p
-                    }),
-                  )
-                }}
-              />
-            )
-          },
-        },
-      ]
+  const paymentColumns = [
+    {
+      header: 'From Account',
+      render: (
+        bp: PaymentRow,
+        update: (p: Partial<PaymentRow>) => void,
+        onKeyDown: (e: React.KeyboardEvent) => void,
+      ) => (
+        <select
+          className="border px-1 text-foreground"
+          value={bp.fromAccount}
+          onChange={(e) => update({ fromAccount: e.target.value })}
+          onKeyDown={onKeyDown}
+        >
+          {accounts.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.name}
+            </option>
+          ))}
+        </select>
+      ),
     },
-    [allAccounts, profiles],
-  )
-
-  const table = useReactTable({
-    data: profiles,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    getSubRows: (row) => row.subRows,
-    state: { expanded },
-    onExpandedChange: setExpanded,
-  })
+    {
+      header: 'Amount',
+      render: (
+        bp: PaymentRow,
+        update: (p: Partial<PaymentRow>) => void,
+        onKeyDown: (e: React.KeyboardEvent) => void,
+      ) => (
+        <input
+          type="number"
+          className="w-24 border px-1"
+          value={bp.amount}
+          onChange={(e) => update({ amount: parseFloat(e.target.value) })}
+          onKeyDown={onKeyDown}
+        />
+      ),
+    },
+  ]
 
   return (
     <div className="flex flex-col gap-6 max-w-6xl mx-auto">
@@ -419,7 +464,6 @@ export default function BillingCyclePlannerPage() {
         <Modal
           title="Create new billing cycle?"
           triggerLabel="New Billing Cycle"
-          triggerClassName=""
           onOpen={() => setCreateOpen(true)}
         >
           {cycles.some((c) => c.month === dayjs().format('MMMM').toUpperCase()) && (
@@ -466,43 +510,158 @@ export default function BillingCyclePlannerPage() {
           </div>
         </div>
       )}
-      <Table className="border text-left">
-        <TableHeader>
-          {table.getHeaderGroups().map((hg) => (
-            <TableRow key={hg.id}>
-              {hg.headers.map((h) => (
-                <TableHead key={h.id} className="text-foreground">
-                  {flexRender(h.column.columnDef.header, h.getContext())}
-                </TableHead>
+      <div className="flex justify-end">
+        <Modal
+          title="Add Spending Category"
+          triggerLabel="Add Category"
+          triggerClassName="mb-2"
+          onOpen={() => setProfileSelect('')}
+        >
+          <select
+            className="border w-full p-2 mb-4 text-foreground"
+            value={profileSelect}
+            onChange={(e) => setProfileSelect(e.target.value)}
+          >
+            <option value="">Select...</option>
+            {allProfiles
+              .filter((p) => !profiles.some((pr) => pr.id === p.id))
+              .map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
               ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-              {row.depth === 0 && (
-                <TableCell>
-                  <Button size="sm" onClick={() => addExpense(row.original.id)}>
-                    Add Expense
-                  </Button>
-                </TableCell>
-              )}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="flex justify-end gap-2">
+          </select>
+          <div className="flex justify-end gap-2">
+            <DialogClose asChild>
+              <Button
+                onClick={() => {
+                  if (profileSelect) addProfile(profileSelect)
+                }}
+                disabled={!profileSelect}
+              >
+                Add
+              </Button>
+            </DialogClose>
+          </div>
+        </Modal>
+      </div>
+      {profiles.map((profile) => {
+        const expenseColumns = [
+          {
+            header: 'Account',
+            render: (
+              row: ExpenseRow,
+              update: (p: Partial<ExpenseRow>) => void,
+              onKeyDown: (e: React.KeyboardEvent) => void,
+            ) => (
+              <select
+                className="border px-1 text-foreground"
+                value={row.account}
+                onChange={(e) => update({ account: e.target.value })}
+                onKeyDown={onKeyDown}
+              >
+                {profile.bankAccounts.map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            ),
+          },
+          {
+            header: 'Amount',
+            render: (
+              row: ExpenseRow,
+              update: (p: Partial<ExpenseRow>) => void,
+              onKeyDown: (e: React.KeyboardEvent) => void,
+            ) => (
+              <input
+                type="number"
+                className="w-24 border px-1"
+                value={row.amount}
+                onChange={(e) => update({ amount: parseFloat(e.target.value) })}
+                onKeyDown={onKeyDown}
+              />
+            ),
+          },
+          {
+            header: 'Description',
+            render: (
+              row: ExpenseRow,
+              update: (p: Partial<ExpenseRow>) => void,
+              onKeyDown: (e: React.KeyboardEvent) => void,
+            ) => (
+              <input
+                type="text"
+                className="w-full border px-1"
+                value={row.description}
+                onChange={(e) => update({ description: e.target.value })}
+                onKeyDown={onKeyDown}
+              />
+            ),
+          },
+        ]
+        return (
+          <div key={profile.id} className="mt-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-semibold text-foreground">{profile.name}</span>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="text-destructive"
+                onClick={() => deleteProfile(profile)}
+              >
+                <TrashIcon className="size-4" />
+              </Button>
+            </div>
+            <EditableTable
+              rows={profile.subRows}
+              setRows={(rows) =>
+                setProfiles((prev) =>
+                  prev.map((p) =>
+                    p.id === profile.id ? { ...p, subRows: rows } : p,
+                  ),
+                )
+              }
+              columns={expenseColumns}
+              makeRow={() => ({
+                id: Math.random().toString(),
+                profileId: profile.id,
+                amount: 0,
+                description: '',
+                account: profile.bankAccounts[0] || '',
+                dirty: true,
+              })}
+              addLabel="Add Expense"
+              onDeleteRow={(r) =>
+                r.serverId && setDeletedExpenses((d) => [...d, r.serverId!])
+              }
+            />
+          </div>
+        )
+      })}
+      <div className="flex justify-end gap-2 mt-4">
         <Button onClick={handleSave} disabled={saving}>
           {saving ? 'Saving...' : 'Save'}
         </Button>
       </div>
-
+      <h2 className="font-bold mt-6 mb-2 text-foreground">Bill Payments</h2>
+      <EditableTable
+        rows={billPayments}
+        setRows={setBillPayments}
+        columns={paymentColumns}
+        makeRow={() => ({
+          id: Math.random().toString(),
+          fromAccount: accounts[0]?.id || '',
+          toCard: cards[0]?.id || '',
+          amount: 0,
+          dirty: true,
+        })}
+        addLabel="Add Bill Payment"
+        onDeleteRow={(r) =>
+          r.serverId && setDeletedPayments((d) => [...d, r.serverId!])
+        }
+      />
       <div>
         <h2 className="font-bold mt-6 mb-2 text-foreground">Payment Suggestions</h2>
         <ul className="list-disc pl-6 text-foreground">
@@ -511,7 +670,6 @@ export default function BillingCyclePlannerPage() {
           ))}
         </ul>
       </div>
-
       <div className="flex justify-end mt-6">
         <Button
           variant="destructive"
@@ -522,6 +680,26 @@ export default function BillingCyclePlannerPage() {
           Complete Bill Payments
         </Button>
       </div>
+      <Modal
+        title="Delete category?"
+        open={!!profileToDelete}
+        onOpenChange={(o) => !o && setProfileToDelete(null)}
+      >
+        <p className="mb-4 text-foreground">
+          This will also remove all expenses under {profileToDelete?.name}.
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (profileToDelete) removeProfile(profileToDelete)
+              setProfileToDelete(null)
+            }}
+          >
+            Confirm
+          </Button>
+        </div>
+      </Modal>
     </div>
   )
 }

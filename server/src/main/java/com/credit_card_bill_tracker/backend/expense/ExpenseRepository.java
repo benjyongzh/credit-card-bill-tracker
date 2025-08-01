@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface ExpenseRepository extends BaseRepository<Expense, UUID> {
     List<Expense> findByUserId(UUID userId);
     List<Expense> findByUserIdAndCreditCardId(UUID userId, UUID cardId);
+    List<Expense> findByUserIdAndBillingCycleId(UUID userId, UUID billingCycleId);
 }
