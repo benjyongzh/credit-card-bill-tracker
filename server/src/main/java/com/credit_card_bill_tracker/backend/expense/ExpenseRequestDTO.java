@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 @Data
 public class ExpenseRequestDTO {
+    private UUID id;
     private UUID creditCardId;
     private LocalDate date;
     private double amount;

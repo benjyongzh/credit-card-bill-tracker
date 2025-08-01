@@ -7,6 +7,7 @@ import java.util.UUID;
 
 @Data
 public class BillPaymentRequestDTO {
+    private UUID id;
     private UUID fromAccountId;
     private UUID toCardId;
     private UUID toAccountId;

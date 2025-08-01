@@ -18,6 +18,7 @@ public class ExpenseMapper {
 
     public ExpenseRequestDTO toDto(Expense entity) {
         ExpenseRequestDTO dto = new ExpenseRequestDTO();
+        dto.setId(entity.getId());
         dto.setDate(entity.getDate());
         dto.setAmount(entity.getAmount());
         dto.setDescription(entity.getDescription());
