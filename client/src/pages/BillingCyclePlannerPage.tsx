@@ -6,6 +6,8 @@ import {
   creditCardApi,
   bankAccountApi,
   expenseApi,
+  spendingProfileApi,
+  billPaymentApi,
 } from '@/lib/api'
 import type { BillingCycle, Card, BankAccount } from '@/lib/dataSchema'
 import { Button } from '@/components/ui/button'
@@ -28,6 +30,7 @@ interface PaymentRow {
 export default function BillingCyclePlannerPage() {
   const {
     profiles,
+    setProfiles,
   } = useProfiles()
 
   const [saving, setSaving] = useState(false)
@@ -267,6 +270,13 @@ export default function BillingCyclePlannerPage() {
     if (!currentCycle) return
     if (cycles.some((c) => c.id !== currentCycle.id && c.month === val)) return
     updateCycle({ label: labelInput, month: val })
+  }
+
+  const removeProfile = (profile: ProfileRow) => {
+    spendingProfileApi.remove(profile.id).catch(() => {
+      /* ignore */
+    })
+    setProfiles((prev) => prev.filter((p) => p.id !== profile.id))
   }
 
   return (
