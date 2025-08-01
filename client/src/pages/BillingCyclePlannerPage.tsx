@@ -14,7 +14,7 @@ import { DialogClose } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import ProfileSection from '@/components/ProfileSection'
 import BillPaymentSection from '@/components/BillPaymentSection'
-import { useProfiles } from '@/hooks/useProfiles'
+import { useProfiles, type ProfileRow } from '@/hooks/useProfiles'
 
 interface PaymentRow {
   id: string
