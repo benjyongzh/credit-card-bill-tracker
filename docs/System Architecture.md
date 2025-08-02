@@ -310,8 +310,9 @@ This links the Git hook and creates `/server/.env` for Liquibase. Next copy
 database URL, credentials and OAuth settings. The backend reads this file when
 `spring.profiles.active=local`.
 
-CI is handled by GitHub Actions (`test.yml`) which builds the Maven and npm
-projects and validates Liquibase changelogs. Runtime environments include local,
+CI is handled by GitHub Actions (`backend.yml` and `frontend.yml`) which build
+the Maven and npm projects and validate Liquibase changelogs. Runtime
+environments include local,
 CI (`application-ci.properties`) and production with external config files.
 
 ## 6. Monitoring, Logging, & Alerts
