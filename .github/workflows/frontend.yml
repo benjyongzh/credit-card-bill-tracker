@@ -47,8 +47,17 @@ jobs:
         run: npm run build
       - name: Zip build output
         run: zip -r ${{ steps.get_frontend_meta.outputs.name }}-${{ steps.get_frontend_meta.outputs.version }}-${{ env.BUILD_TAG }}.zip dist/
+      - name: Build Docker image
+        run: docker build -t ${{ steps.get_frontend_meta.outputs.name }}:${{ steps.get_frontend_meta.outputs.version }}-${{ env.BUILD_TAG }} .
+      - name: Save Docker image
+        run: docker save ${{ steps.get_frontend_meta.outputs.name }}:${{ steps.get_frontend_meta.outputs.version }}-${{ env.BUILD_TAG }} -o ${{ steps.get_frontend_meta.outputs.name }}-${{ steps.get_frontend_meta.outputs.version }}-${{ env.BUILD_TAG }}.tar
       - name: Upload build ZIP
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.get_frontend_meta.outputs.name }}-${{ steps.get_frontend_meta.outputs.version }}-${{ env.BUILD_TAG }}
           path: client/${{ steps.get_frontend_meta.outputs.name }}-${{ steps.get_frontend_meta.outputs.version }}-${{ env.BUILD_TAG }}.zip
+      - name: Upload Docker image
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.get_frontend_meta.outputs.name }}-${{ steps.get_frontend_meta.outputs.version }}-${{ env.BUILD_TAG }}-docker-image
+          path: client/${{ steps.get_frontend_meta.outputs.name }}-${{ steps.get_frontend_meta.outputs.version }}-${{ env.BUILD_TAG }}.tar

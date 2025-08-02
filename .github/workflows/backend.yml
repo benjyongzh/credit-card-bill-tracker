@@ -49,11 +49,20 @@ jobs:
         run: |
           mv target/${{ steps.get_meta.outputs.artifactId }}-${{ steps.get_meta.outputs.version }}.jar \
              target/${{ steps.get_meta.outputs.artifactId }}-${{ steps.get_meta.outputs.version }}-${{ env.BUILD_TAG }}.jar
+      - name: Build Docker image
+        run: docker build -f Dockerfile.app -t ${{ steps.get_meta.outputs.artifactId }}:${{ steps.get_meta.outputs.version }}-${{ env.BUILD_TAG }} .
+      - name: Save Docker image
+        run: docker save ${{ steps.get_meta.outputs.artifactId }}:${{ steps.get_meta.outputs.version }}-${{ env.BUILD_TAG }} -o ${{ steps.get_meta.outputs.artifactId }}-${{ steps.get_meta.outputs.version }}-${{ env.BUILD_TAG }}.tar
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.get_meta.outputs.artifactId }}-${{ steps.get_meta.outputs.version }}-${{ env.BUILD_TAG }}
           path: server/target/${{ steps.get_meta.outputs.artifactId }}-${{ steps.get_meta.outputs.version }}-${{ env.BUILD_TAG }}.jar
+      - name: Upload Docker image
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.get_meta.outputs.artifactId }}-${{ steps.get_meta.outputs.version }}-${{ env.BUILD_TAG }}-docker-image
+          path: server/${{ steps.get_meta.outputs.artifactId }}-${{ steps.get_meta.outputs.version }}-${{ env.BUILD_TAG }}.tar
 
   liquibase-validate:
     name: Validate Liquibase Changelogs + Generate SQL
