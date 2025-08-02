@@ -59,7 +59,8 @@ cd server
 
 This downloads all dependencies into the local Maven cache so agents can run `./mvnw test` without needing internet access.
 
-If the agent can use `.m2`, ensure it’s populated and restored before test execution.
+If the agent supports using a prebuilt .m2 cache, it may unpack one prepared by the development team (e.g., via tar -xzf m2-cache.tar.gz -C ~/) before running tests.
+If `.m2` is not present, agents must rely on the Maven wrapper and a pre-prepared environment (e.g., Docker image or unpacked cache).
 
 ---
 
