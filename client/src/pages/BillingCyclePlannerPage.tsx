@@ -289,12 +289,12 @@ export default function BillingCyclePlannerPage() {
           )}
           <div className="flex justify-end gap-2 mt-4">
             <DialogClose asChild>
-              <Button variant="secondary" onClick={() => setCreateOpen(false)}>
-                Cancel
-              </Button>
+              <Button onClick={createCycle}>Confirm</Button>
             </DialogClose>
             <DialogClose asChild>
-              <Button onClick={createCycle}>Confirm</Button>
+              <Button variant="ghost" className="text-foreground" onClick={() => setCreateOpen(false)}>
+                Cancel
+              </Button>
             </DialogClose>
           </div>
         </Modal>
@@ -335,11 +335,11 @@ export default function BillingCyclePlannerPage() {
       <div>
         <h2 className="font-bold mt-6 mb-2 text-foreground">Payment Suggestions</h2>
         {suggestionsLoading ? (
-          <p>Loading suggestions...</p>
+          <p className="text-foreground text-center">Loading suggestions...</p>
         ) : suggestionsError ? (
-          <p className="text-destructive">{suggestionsError}</p>
+          <p className="text-destructive text-center">{suggestionsError}</p>
         ) : suggestions.length === 0 ? (
-          <p>Nothing to show.</p>
+          <p className="text-foreground text-center">Nothing to show.</p>
         ) : (
           <ul className="list-disc pl-6 text-foreground">
             {suggestions.map((s, idx) => (

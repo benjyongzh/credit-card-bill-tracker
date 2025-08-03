@@ -73,16 +73,16 @@ export default function ManagementPage<T extends { id: string | number }>({
       {subtitle && (<div className="hidden sm:flex text-muted-foreground">{subtitle}</div>)}
 
 
-      <Table className="border text-left mt-4">
-        <TableHeader>
+      <Table className="text-left mt-4">
+        <TableHeader className="bg-muted">
           <TableRow>
             {columns.map((c) => (
-              <TableHead key={String(c.key)}>{c.header}</TableHead>
+              <TableHead className="text-center" key={String(c.key)}>{c.header}</TableHead>
             ))}
-            <TableHead>Actions</TableHead>
+            <TableHead className="text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className="bg-muted/30">
           {loading ? (
             <TableRow>
               <TableCell colSpan={columns.length + 1} className="text-foreground text-center">Loading...</TableCell>

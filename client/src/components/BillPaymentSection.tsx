@@ -96,11 +96,11 @@ export default function BillPaymentSection({ accounts, cards }: Props) {
   return (
     <div className="flex flex-col gap-2">
       {loading ? (
-        <p>Loading payments...</p>
+        <p className="text-foreground text-center">Loading payments...</p>
       ) : error ? (
-        <p className="text-destructive">{error}</p>
+        <p className="text-destructive text-center">{error}</p>
       ) : payments.length === 0 ? (
-        <p>No payments to show.</p>
+        <p className="text-foreground text-center">No payments to show.</p>
       ) : (
         <EditableTable
           table={table}

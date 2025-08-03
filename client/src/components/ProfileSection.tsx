@@ -130,9 +130,9 @@ export default function ProfileSection() {
     onExpandedChange: setExpanded as any,
   })
 
-  if (loading) return <p>Loading profiles...</p>
-  if (error) return <p className="text-destructive">{error}</p>
-  if (!profiles.length) return <p>No profiles to show.</p>
+  if (loading) return <p className="text-foreground text-center">Loading profiles...</p>
+  if (error) return <p className="text-destructive text-center">{error}</p>
+  if (!profiles.length) return <p className="text-foreground text-center">No profiles to show.</p>
 
   return (
     <EditableTable
