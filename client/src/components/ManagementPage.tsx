@@ -39,7 +39,7 @@ export default function ManagementPage<T extends { id: string | number }>({
   defaultValues,
   renderForm,
 }: Props<T>) {
-  const { items, create, update, remove } = useEntityList<T>(endpoint)
+  const { items, create, update, remove, loading, error } = useEntityList<T>(endpoint)
   const [editing, setEditing] = useState<T | null>(null)
 
   const handleCreate = async (data: Partial<T>) => {
@@ -83,31 +83,47 @@ export default function ManagementPage<T extends { id: string | number }>({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {items.map((item) => (
-            <TableRow key={item.id}>
-              {columns.map((c) => (
-                <TableCell key={String(c.key)}>
-                  {c.render ? c.render(item) : (item as any)[c.key]}
-                </TableCell>
-              ))}
-              <TableCell className="space-x-2">
-                <ModalForm
-                  title="Edit"
-                  triggerLabel="Edit"
-                  formSchema={formSchema}
-                  defaultValues={{ ...defaultValues, ...item }}
-                  onOpen={() => setEditing(item)}
-                  onSubmit={(data) => handleUpdate(data as Partial<T>)}
-                  triggerClassName="mr-2"
-                >
-                  {(form) => renderForm(item, form)}
-                </ModalForm>
-                <Button variant="destructive" onClick={() => remove(item.id)}>
-                  Delete
-                </Button>
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={columns.length + 1}>Loading...</TableCell>
+            </TableRow>
+          ) : error ? (
+            <TableRow>
+              <TableCell colSpan={columns.length + 1} className="text-destructive">
+                {error}
               </TableCell>
             </TableRow>
-          ))}
+          ) : items.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={columns.length + 1}>Nothing to show.</TableCell>
+            </TableRow>
+          ) : (
+            items.map((item) => (
+              <TableRow key={item.id}>
+                {columns.map((c) => (
+                  <TableCell key={String(c.key)}>
+                    {c.render ? c.render(item) : (item as any)[c.key]}
+                  </TableCell>
+                ))}
+                <TableCell className="space-x-2">
+                  <ModalForm
+                    title="Edit"
+                    triggerLabel="Edit"
+                    formSchema={formSchema}
+                    defaultValues={{ ...defaultValues, ...item }}
+                    onOpen={() => setEditing(item)}
+                    onSubmit={(data) => handleUpdate(data as Partial<T>)}
+                    triggerClassName="mr-2"
+                  >
+                    {(form) => renderForm(item, form)}
+                  </ModalForm>
+                  <Button variant="destructive" onClick={() => remove(item.id)}>
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { spendingProfileApi } from '@/lib/api'
 import type { SpendingProfile } from '@/lib/dataSchema'
+import { useFetch } from '@/hooks/useFetch'
 
 export interface ExpenseRow {
   id: string
@@ -23,22 +24,26 @@ export function useProfiles() {
   const [profiles, setProfiles] = useState<ProfileRow[]>([])
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 
-  useEffect(() => {
-    spendingProfileApi
-      .getAll()
-      .then((res) => {
-        const data = (res.data as SpendingProfile[]).map((p) => ({
+  const fetchProfiles = useCallback(
+    () =>
+      spendingProfileApi.getAll().then((res) =>
+        (res.data as SpendingProfile[]).map((p) => ({
           id: p.id,
           name: p.name,
           bankAccounts: p.bankAccounts,
           subRows: [],
-        }))
-        setProfiles(data)
-      })
-      .catch(() => {
-        /* ignore */
-      })
-  }, [])
+        })),
+      ),
+    [],
+  )
+
+  const { data, loading, error, reload } = useFetch<ProfileRow[]>(fetchProfiles, {
+    errorMessage: 'Failed to load spending profiles',
+  })
+
+  useEffect(() => {
+    if (data) setProfiles(data)
+  }, [data])
 
   const addExpense = (profileId: string) => {
     setProfiles((prev) =>
@@ -85,5 +90,16 @@ export function useProfiles() {
     return Array.from(set)
   }, [profiles])
 
-  return { profiles, setProfiles, expanded, setExpanded, addExpense, updateExpense, allAccounts }
+  return {
+    profiles,
+    setProfiles,
+    expanded,
+    setExpanded,
+    addExpense,
+    updateExpense,
+    allAccounts,
+    loading,
+    error,
+    reload,
+  }
 }

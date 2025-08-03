@@ -49,6 +49,8 @@ export default function DashboardPage() {
   const [unpaid, setUnpaid] = useState<UnpaidPerCard[]>([])
   const [accountTotals, setAccountTotals] = useState<SpendPerAccount[]>([])
   const [cycleData, setCycleData] = useState<CycleChartDatum[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -124,9 +126,10 @@ export default function DashboardPage() {
       setCycleData(cycleArr)
     }
 
-    load().catch(() => {
-      // noop
-    })
+    setLoading(true)
+    load()
+      .catch(() => setError('Failed to load dashboard data'))
+      .finally(() => setLoading(false))
   }, [])
 
   return (
@@ -144,12 +147,32 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {unpaid.map((u) => (
-                <tr key={u.cardId} className="border-t">
-                  <td className="p-2">{u.cardName}</td>
-                  <td className="p-2">{formatNumber(u.amount, { precision: 2 })}</td>
+              {loading ? (
+                <tr>
+                  <td colSpan={2} className="p-2">
+                    Loading...
+                  </td>
                 </tr>
-              ))}
+              ) : error ? (
+                <tr>
+                  <td colSpan={2} className="p-2 text-destructive">
+                    {error}
+                  </td>
+                </tr>
+              ) : unpaid.length === 0 ? (
+                <tr>
+                  <td colSpan={2} className="p-2">
+                    Nothing to show.
+                  </td>
+                </tr>
+              ) : (
+                unpaid.map((u) => (
+                  <tr key={u.cardId} className="border-t">
+                    <td className="p-2">{u.cardName}</td>
+                    <td className="p-2">{formatNumber(u.amount, { precision: 2 })}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -164,12 +187,32 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {accountTotals.map((a) => (
-                <tr key={a.accountId} className="border-t">
-                  <td className="p-2">{a.accountName}</td>
-                  <td className="p-2">{formatNumber(a.amount, { precision: 2 })}</td>
+              {loading ? (
+                <tr>
+                  <td colSpan={2} className="p-2">
+                    Loading...
+                  </td>
                 </tr>
-              ))}
+              ) : error ? (
+                <tr>
+                  <td colSpan={2} className="p-2 text-destructive">
+                    {error}
+                  </td>
+                </tr>
+              ) : accountTotals.length === 0 ? (
+                <tr>
+                  <td colSpan={2} className="p-2">
+                    Nothing to show.
+                  </td>
+                </tr>
+              ) : (
+                accountTotals.map((a) => (
+                  <tr key={a.accountId} className="border-t">
+                    <td className="p-2">{a.accountName}</td>
+                    <td className="p-2">{formatNumber(a.amount, { precision: 2 })}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -177,15 +220,23 @@ export default function DashboardPage() {
 
       <div className="w-full h-72">
         <h2 className="font-bold mb-2 text-foreground">Expenses vs Payments</h2>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={cycleData} margin={{ top: 20, right: 30, bottom: 5, left: 0 }}>
-            <XAxis dataKey="label" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="expenses" stackId="total" fill="var(--chart-2)" name="Expenses" />
-            <Bar dataKey="payments" stackId="total" fill="var(--chart-1)" name="Paid" />
-          </BarChart>
-        </ResponsiveContainer>
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p className="text-destructive">{error}</p>
+        ) : cycleData.length === 0 ? (
+          <p>Nothing to show.</p>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={cycleData} margin={{ top: 20, right: 30, bottom: 5, left: 0 }}>
+              <XAxis dataKey="label" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="expenses" stackId="total" fill="var(--chart-2)" name="Expenses" />
+              <Bar dataKey="payments" stackId="total" fill="var(--chart-1)" name="Paid" />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   )
