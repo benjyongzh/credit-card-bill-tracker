@@ -142,7 +142,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8 max-w-6xl mx-auto">
-      <h1 className="page-title">Dashboard</h1>
+      <h1 className="page-title mt-6">Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
@@ -150,14 +150,14 @@ export default function DashboardPage() {
           <Table className="text-left">
             <TableHeader className="bg-muted">
               <TableRow>
-                <TableHead>Card</TableHead>
-                <TableHead>Unpaid</TableHead>
+                <TableHead className="text-center">Card</TableHead>
+                <TableHead className="text-center">Unpaid</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="bg-muted/30">
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={2} className="text-center">
+                  <TableCell colSpan={2} className="text-foreground text-center">
                     Loading...
                   </TableCell>
                 </TableRow>
@@ -169,7 +169,7 @@ export default function DashboardPage() {
                 </TableRow>
               ) : unpaid.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={2} className="text-center">
+                  <TableCell colSpan={2} className="text-foreground text-center">
                     Nothing to show.
                   </TableCell>
                 </TableRow>
@@ -190,14 +190,14 @@ export default function DashboardPage() {
           <Table className="text-left">
             <TableHeader className="bg-muted">
               <TableRow>
-                <TableHead>Account</TableHead>
-                <TableHead>Total Spent</TableHead>
+                <TableHead className="text-center">Account</TableHead>
+                <TableHead className="text-center">Total Spent</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="bg-muted/30">
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={2} className="text-center">
+                  <TableCell colSpan={2} className="text-foreground text-center">
                     Loading...
                   </TableCell>
                 </TableRow>
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                 </TableRow>
               ) : accountTotals.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={2} className="text-center">
+                  <TableCell colSpan={2} className="text-foregorund text-center">
                     Nothing to show.
                   </TableCell>
                 </TableRow>

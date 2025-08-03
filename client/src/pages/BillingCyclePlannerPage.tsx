@@ -275,7 +275,7 @@ export default function BillingCyclePlannerPage() {
 
   return (
     <div className="flex flex-col gap-6 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mt-6">
         <h1 className="page-title">Billing Cycle Planner</h1>
         <Modal
           title="Create new billing cycle?"

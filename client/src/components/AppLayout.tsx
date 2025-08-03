@@ -3,7 +3,12 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { MenuIcon, XIcon } from 'lucide-react'
+import {LogOut, MenuIcon, XIcon} from 'lucide-react'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export default function AppLayout({ children }: { children?: ReactNode }) {
   const { logout } = useAuth()
@@ -17,7 +22,7 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
     if (path.includes("credit-cards")) return "Credit Cards"
     if (path.includes("bank-accounts")) return "Bank Accounts"
     if (path.includes("spending-profiles")) return "Spending Categories"
-    if (path.includes("billing-cycle")) return "Billing Cycle Planner"
+    if (path.includes("billing-cycle")) return "Planner"
       if (path.includes("not-found")) return "404 - Not Found"
     return ""
   }
@@ -47,10 +52,10 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
             </Button>
 
             <nav className="flex flex-col gap-4 flex-1">
-                <NavLink className="font-bold" to="/credit-cards">Cards</NavLink>
-                <NavLink className="font-bold" to="/bank-accounts">Accounts</NavLink>
-                <NavLink className="font-bold" to="/spending-profiles">Categories</NavLink>
-                <NavLink className="font-bold" to="/billing-cycle">Cycle Planner</NavLink>
+                <NavLink className="font-bold" onClick={() => setOpen(false)} to="/billing-cycle">Planner</NavLink>
+                <NavLink className="font-bold" onClick={() => setOpen(false)} to="/credit-cards">Cards</NavLink>
+                <NavLink className="font-bold" onClick={() => setOpen(false)} to="/bank-accounts">Accounts</NavLink>
+                <NavLink className="font-bold" onClick={() => setOpen(false)} to="/spending-profiles">Categories</NavLink>
             </nav>
 
             <Button
@@ -66,12 +71,22 @@ export default function AppLayout({ children }: { children?: ReactNode }) {
       <header className="hidden sm:flex items-center justify-end gap-6 text-foreground p-4 border-b border-muted">
         <nav className="flex items-center space-x-8">
           <NavLink className="fixed left-5 text-foreground font-bold" to="/">Credit Card Bill Tracker</NavLink>
+            <NavLink className="font-bold" to="/billing-cycle">Planner</NavLink>
           <NavLink className="font-bold" to="/credit-cards">Cards</NavLink>
           <NavLink className="font-bold" to="/bank-accounts">Accounts</NavLink>
           <NavLink className="font-bold" to="/spending-profiles">Categories</NavLink>
-          <NavLink className="font-bold" to="/billing-cycle">Cycle Planner</NavLink>
         </nav>
-        <Button variant="destructive" className="button-destructive" onClick={logout}>Logout</Button>
+          <Tooltip>
+          <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="cursor-pointer text-accent hover:!bg-destructive hover:!text-destructive-foreground" onClick={logout}>
+                  <LogOut />
+              </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+              <p>Logout</p>
+          </TooltipContent>
+        </Tooltip>
+
       </header>
 
       <main className="flex-1 p-4">
