@@ -26,6 +26,14 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
 
 interface UnpaidPerCard {
   cardId: string
@@ -139,82 +147,82 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <h2 className="font-bold mb-2 text-foreground">Unpaid Expenses per Card</h2>
-          <table className="w-full border text-left text-foreground">
-            <thead>
-              <tr>
-                <th className="p-2">Card</th>
-                <th className="p-2">Unpaid</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table className="text-left">
+            <TableHeader className="bg-muted">
+              <TableRow>
+                <TableHead>Card</TableHead>
+                <TableHead>Unpaid</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="bg-muted/30">
               {loading ? (
-                <tr>
-                  <td colSpan={2} className="p-2 text-center">
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center">
                     Loading...
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : error ? (
-                <tr>
-                  <td colSpan={2} className="p-2 text-destructive text-center">
+                <TableRow>
+                  <TableCell colSpan={2} className="text-destructive text-center">
                     {error}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : unpaid.length === 0 ? (
-                <tr>
-                  <td colSpan={2} className="p-2 text-center">
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center">
                     Nothing to show.
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : (
                 unpaid.map((u) => (
-                  <tr key={u.cardId} className="border-t">
-                    <td className="p-2">{u.cardName}</td>
-                    <td className="p-2">{formatNumber(u.amount, { precision: 2 })}</td>
-                  </tr>
+                  <TableRow key={u.cardId}>
+                    <TableCell>{u.cardName}</TableCell>
+                    <TableCell>{formatNumber(u.amount, { precision: 2 })}</TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         <div>
           <h2 className="font-bold mb-2 text-foreground">Historical Spend by Account</h2>
-          <table className="w-full border text-left text-foreground">
-            <thead>
-              <tr>
-                <th className="p-2">Account</th>
-                <th className="p-2">Total Spent</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table className="text-left">
+            <TableHeader className="bg-muted">
+              <TableRow>
+                <TableHead>Account</TableHead>
+                <TableHead>Total Spent</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="bg-muted/30">
               {loading ? (
-                <tr>
-                  <td colSpan={2} className="p-2 text-center">
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center">
                     Loading...
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : error ? (
-                <tr>
-                  <td colSpan={2} className="p-2 text-destructive text-center">
+                <TableRow>
+                  <TableCell colSpan={2} className="text-destructive text-center">
                     {error}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : accountTotals.length === 0 ? (
-                <tr>
-                  <td colSpan={2} className="p-2 text-center">
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center">
                     Nothing to show.
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : (
                 accountTotals.map((a) => (
-                  <tr key={a.accountId} className="border-t">
-                    <td className="p-2">{a.accountName}</td>
-                    <td className="p-2">{formatNumber(a.amount, { precision: 2 })}</td>
-                  </tr>
+                  <TableRow key={a.accountId}>
+                    <TableCell>{a.accountName}</TableCell>
+                    <TableCell>{formatNumber(a.amount, { precision: 2 })}</TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
 
