@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useCallback } from 'react'
 import api from '@/lib/api'
+import { useFetch } from '@/hooks/useFetch'
 
 export interface PaymentSuggestion {
   cardName: string
@@ -7,19 +8,22 @@ export interface PaymentSuggestion {
 }
 
 export function usePaymentSuggestions(enabled = true) {
-  const [suggestions, setSuggestions] = useState<PaymentSuggestion[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const fetchSuggestions = useCallback(
+    () => api.get('/bills/optimizer').then((res) => res.data),
+    [],
+  )
+
+  const { data, loading, error, reload } = useFetch<PaymentSuggestion[]>(
+    fetchSuggestions,
+    {
+      immediate: false,
+      errorMessage: 'Failed to load suggestions',
+    },
+  )
 
   useEffect(() => {
-    if (!enabled) return
-    setLoading(true)
-    api
-      .get('/bills/optimizer')
-      .then((res) => setSuggestions(res.data))
-      .catch(() => setError('Failed to load suggestions'))
-      .finally(() => setLoading(false))
-  }, [enabled])
+    if (enabled) reload()
+  }, [enabled, reload])
 
-  return { suggestions, loading, error }
+  return { suggestions: data ?? [], loading, error }
 }

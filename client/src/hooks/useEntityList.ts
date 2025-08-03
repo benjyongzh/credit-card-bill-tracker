@@ -1,22 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import api from '@/lib/api'
+import { useFetch } from '@/hooks/useFetch'
 
 export function useEntityList<T extends { id: string | number }>(endpoint: string) {
   const [items, setItems] = useState<T[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  const load = () => {
-    setLoading(true)
-    api.get<T[]>(endpoint)
-      .then(res => setItems(res.data))
-      .catch(() => setError('Failed to load data'))
-      .finally(() => setLoading(false))
-  }
+  const fetchItems = useCallback(
+    () => api.get<T[]>(endpoint).then((res) => res.data),
+    [endpoint],
+  )
+
+  const { data, loading, error, reload } = useFetch<T[]>(fetchItems, {
+    errorMessage: 'Failed to load data',
+  })
 
   useEffect(() => {
-    load()
-  }, [endpoint])
+    if (data) setItems(data)
+  }, [data])
 
   const create = async (payload: Partial<T>) => {
     const res = await api.post<T>(endpoint, payload)
@@ -33,5 +33,5 @@ export function useEntityList<T extends { id: string | number }>(endpoint: strin
     setItems(items => items.filter(it => it.id !== id))
   }
 
-  return { items, loading, error, create, update, remove, reload: load }
+  return { items, loading, error, create, update, remove, reload }
 }

@@ -8,7 +8,16 @@ import type { ProfileRow, ExpenseRow } from '@/hooks/useProfiles'
 import { useProfiles } from '@/hooks/useProfiles'
 
 export default function ProfileSection() {
-  const { profiles, expanded, setExpanded, addExpense, updateExpense, allAccounts } = useProfiles()
+  const {
+    profiles,
+    expanded,
+    setExpanded,
+    addExpense,
+    updateExpense,
+    allAccounts,
+    loading,
+    error,
+  } = useProfiles()
 
   const columns = useMemo<ColumnDef<ProfileRow>[]>(
     () => {
@@ -120,6 +129,10 @@ export default function ProfileSection() {
     state: { expanded },
     onExpandedChange: setExpanded as any,
   })
+
+  if (loading) return <p>Loading profiles...</p>
+  if (error) return <p className="text-destructive">{error}</p>
+  if (!profiles.length) return <p>No profiles to show.</p>
 
   return (
     <EditableTable

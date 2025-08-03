@@ -1,19 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { billPaymentApi } from '@/lib/api'
 import type { BillPayment } from '@/lib/dataSchema'
+import { useFetch } from '@/hooks/useFetch'
 
 export function useBillPayments() {
   const [payments, setPayments] = useState<BillPayment[]>([])
   const [deletedIds, setDeletedIds] = useState<string[]>([])
 
+  const fetchPayments = useCallback(
+    () => billPaymentApi.getAll().then((res) => res.data as BillPayment[]),
+    [],
+  )
+
+  const { data, loading, error, reload } = useFetch(fetchPayments, {
+    errorMessage: 'Failed to load bill payments',
+  })
+
   useEffect(() => {
-    billPaymentApi
-      .getAll()
-      .then((res) => setPayments(res.data as BillPayment[]))
-      .catch(() => {
-        /* ignore */
-      })
-  }, [])
+    if (data) setPayments(data)
+  }, [data])
 
   const addPayment = (payment: BillPayment) => {
     setPayments((p) => [...p, payment])
@@ -28,5 +33,14 @@ export function useBillPayments() {
     setDeletedIds((d) => [...d, id])
   }
 
-  return { payments, deletedIds, addPayment, updatePayment, removePayment }
+  return {
+    payments,
+    deletedIds,
+    addPayment,
+    updatePayment,
+    removePayment,
+    loading,
+    error,
+    reload,
+  }
 }

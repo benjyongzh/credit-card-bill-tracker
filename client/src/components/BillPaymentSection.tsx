@@ -13,7 +13,14 @@ interface Props {
 }
 
 export default function BillPaymentSection({ accounts, cards }: Props) {
-  const { payments, addPayment, removePayment, updatePayment } = useBillPayments()
+  const {
+    payments,
+    addPayment,
+    removePayment,
+    updatePayment,
+    loading,
+    error,
+  } = useBillPayments()
 
   const columns = useMemo<ColumnDef<BillPayment>[]>(
     () => [
@@ -88,14 +95,22 @@ export default function BillPaymentSection({ accounts, cards }: Props) {
 
   return (
     <div className="flex flex-col gap-2">
-      <EditableTable
-        table={table}
-        renderRowAction={(row) => (
-          <Button variant="destructive" size="sm" onClick={() => removePayment(row.original.id)}>
-            Delete
-          </Button>
-        )}
-      />
+      {loading ? (
+        <p>Loading payments...</p>
+      ) : error ? (
+        <p className="text-destructive">{error}</p>
+      ) : payments.length === 0 ? (
+        <p>No payments to show.</p>
+      ) : (
+        <EditableTable
+          table={table}
+          renderRowAction={(row) => (
+            <Button variant="destructive" size="sm" onClick={() => removePayment(row.original.id)}>
+              Delete
+            </Button>
+          )}
+        />
+      )}
       <div className="mt-2">
         <Button
           size="sm"

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import {
-  billOptimizerApi,
   billingCycleApi,
   creditCardApi,
   bankAccountApi,
@@ -17,6 +16,7 @@ import { Input } from '@/components/ui/input'
 import ProfileSection from '@/components/ProfileSection'
 import BillPaymentSection from '@/components/BillPaymentSection'
 import { useProfiles, type ProfileRow } from '@/hooks/useProfiles'
+import { usePaymentSuggestions } from '@/hooks/usePaymentSuggestions'
 
 interface PaymentRow {
   id: string
@@ -37,7 +37,8 @@ export default function BillingCyclePlannerPage() {
   const [deletedExpenses, setDeletedExpenses] = useState<string[]>([])
   const [billPayments, setBillPayments] = useState<PaymentRow[]>([])
   const [deletedPayments, setDeletedPayments] = useState<string[]>([])
-  const [suggestions, setSuggestions] = useState<any[]>([])
+  const { suggestions, loading: suggestionsLoading, error: suggestionsError } =
+    usePaymentSuggestions()
   const [currentCycle, setCurrentCycle] = useState<BillingCycle | null>(null)
   const [cycles, setCycles] = useState<BillingCycle[]>([])
   const [accounts, setAccounts] = useState<BankAccount[]>([])
@@ -64,13 +65,6 @@ export default function BillingCyclePlannerPage() {
           setMonthInput(latest.month)
         }
       })
-      .catch(() => {
-        /* ignore */
-      })
-
-    billOptimizerApi
-      .getSuggestions()
-      .then((res) => setSuggestions(res.data))
       .catch(() => {
         /* ignore */
       })
@@ -340,11 +334,19 @@ export default function BillingCyclePlannerPage() {
       </div>
       <div>
         <h2 className="font-bold mt-6 mb-2 text-foreground">Payment Suggestions</h2>
-        <ul className="list-disc pl-6 text-foreground">
-          {suggestions.map((s, idx) => (
-            <li key={idx}>{JSON.stringify(s)}</li>
-          ))}
-        </ul>
+        {suggestionsLoading ? (
+          <p>Loading suggestions...</p>
+        ) : suggestionsError ? (
+          <p className="text-destructive">{suggestionsError}</p>
+        ) : suggestions.length === 0 ? (
+          <p>Nothing to show.</p>
+        ) : (
+          <ul className="list-disc pl-6 text-foreground">
+            {suggestions.map((s, idx) => (
+              <li key={idx}>{JSON.stringify(s)}</li>
+            ))}
+          </ul>
+        )}
       </div>
       <BillPaymentSection accounts={accounts} cards={cards} />
       <div className="flex justify-end mt-6">
