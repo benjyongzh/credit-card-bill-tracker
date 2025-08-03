@@ -85,17 +85,17 @@ export default function ManagementPage<T extends { id: string | number }>({
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={columns.length + 1}>Loading...</TableCell>
+              <TableCell colSpan={columns.length + 1} className="text-foreground text-center">Loading...</TableCell>
             </TableRow>
           ) : error ? (
             <TableRow>
-              <TableCell colSpan={columns.length + 1} className="text-destructive">
+              <TableCell colSpan={columns.length + 1} className="text-destructive text-center">
                 {error}
               </TableCell>
             </TableRow>
           ) : items.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={columns.length + 1}>Nothing to show.</TableCell>
+              <TableCell colSpan={columns.length + 1} className="text-center">Nothing to show.</TableCell>
             </TableRow>
           ) : (
             items.map((item) => (

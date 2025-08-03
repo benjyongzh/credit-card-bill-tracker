@@ -149,19 +149,19 @@ export default function DashboardPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={2} className="p-2">
+                  <td colSpan={2} className="p-2 text-center">
                     Loading...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={2} className="p-2 text-destructive">
+                  <td colSpan={2} className="p-2 text-destructive text-center">
                     {error}
                   </td>
                 </tr>
               ) : unpaid.length === 0 ? (
                 <tr>
-                  <td colSpan={2} className="p-2">
+                  <td colSpan={2} className="p-2 text-center">
                     Nothing to show.
                   </td>
                 </tr>
@@ -189,19 +189,19 @@ export default function DashboardPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={2} className="p-2">
+                  <td colSpan={2} className="p-2 text-center">
                     Loading...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={2} className="p-2 text-destructive">
+                  <td colSpan={2} className="p-2 text-destructive text-center">
                     {error}
                   </td>
                 </tr>
               ) : accountTotals.length === 0 ? (
                 <tr>
-                  <td colSpan={2} className="p-2">
+                  <td colSpan={2} className="p-2 text-center">
                     Nothing to show.
                   </td>
                 </tr>
@@ -221,11 +221,11 @@ export default function DashboardPage() {
       <div className="w-full h-72">
         <h2 className="font-bold mb-2 text-foreground">Expenses vs Payments</h2>
         {loading ? (
-          <p>Loading...</p>
+          <p className="text-foreground flex justify-center">Loading...</p>
         ) : error ? (
-          <p className="text-destructive">{error}</p>
+          <p className="text-destructive flex justify-center">{error}</p>
         ) : cycleData.length === 0 ? (
-          <p>Nothing to show.</p>
+          <p className="text-foreground flex justify-center">Nothing to show.</p>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={cycleData} margin={{ top: 20, right: 30, bottom: 5, left: 0 }}>
